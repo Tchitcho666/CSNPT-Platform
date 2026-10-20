@@ -183,6 +183,19 @@ export async function deletePractitioner(id: string) {
   revalidatePractitioners();
 }
 
+export async function deleteDrTestPractitionersAction() {
+  await requireAdmin();
+  try {
+    const result = await getDatabaseClient().psychomotricien.deleteMany({ where: { fullName: 'Dr. Test' } });
+    revalidatePractitioners();
+    redirect(`/admin?tab=directory&notice=test-records-cleaned&deleted=${result.count}`);
+  } catch (error) {
+    if (error && typeof error === 'object' && 'digest' in error) throw error;
+    console.error('Test practitioner cleanup failed:', error);
+    redirect('/admin?tab=directory&error=database');
+  }
+}
+
 // Compatibility wrappers for the previous dashboard form components.
 export async function createPsychomotricienAction(formData: FormData) {
   return addPractitioner(formData);

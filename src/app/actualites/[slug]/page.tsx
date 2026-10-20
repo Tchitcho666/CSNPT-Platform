@@ -12,8 +12,10 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getDatabaseClient().news.findFirst({ where: { slug, isPublished: true }, select: { title: true, excerpt: true } });
-  return article ? { title: `${article.title} — CSNPT`, description: article.excerpt } : { title: 'Actualité — CSNPT' };
+  const article = await getDatabaseClient().news.findFirst({ where: { slug, isPublished: true }, select: { title: true, excerpt: true, coverImage: true } });
+  if (!article) return { title: 'Actualité introuvable | CSNPT', description: 'Cette actualité est introuvable.' };
+  const title = `${article.title} | CSNPT`;
+  return { title, description: article.excerpt, openGraph: { type: 'article', title, description: article.excerpt, images: [article.coverImage || '/images/editorial/community-tunisia-gemini.png'] } };
 }
 
 export default async function ActualiteArticlePage({ params }: Props) {

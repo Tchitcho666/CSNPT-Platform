@@ -4644,7 +4644,7 @@ html[data-sensory-mode="calm"] .collage-leaf { opacity: .78; }
 .csnpt-nav-utilities { gap: clamp(.4rem, .8vw, .8rem); }
 .csnpt-nav-utilities > .nav-search-link { order: 0; }
 .csnpt-nav-utilities > button { order: 1; }
-.csnpt-nav-utilities > a[href="/espace-professionnel"] { order: 2; }
+.csnpt-nav-utilities > a[href="/espace-pro/login"] { order: 2; }
 .csnpt-nav-utilities > div:has(button[aria-label="العربية"]) { order: 3; }
 .csnpt-nav-utilities button[aria-label="العربية"] { display: inline-flex; align-items: center; gap: .35rem; white-space: nowrap; }
 .csnpt-nav-utilities button[aria-label="العربية"]::after,
@@ -4842,10 +4842,10 @@ html[data-sensory-mode="calm"] .pillar-item > .pillar-arrow-link { transition: n
 .community-themes li svg { color: #e8aa8d; }
 .community-outro { align-self: stretch; display: flex; align-items: center; justify-content: center; margin: 0; padding: 1rem; color: #f6f1e9; font-family: var(--font-display); font-size: 1rem; font-style: italic; line-height: 1.45; text-align: center; writing-mode: vertical-rl; }
 .service-link { display: flex; }
-.csnpt-nav-utilities > a[href="/espace-professionnel"] { min-height: 2.8rem; align-items: center; border: 1px solid #14272A; border-radius: 999px; background: transparent !important; padding-inline: 1rem; color: #14272A !important; }
-.csnpt-nav-utilities > a[href="/espace-professionnel"] svg { display: none; }
-.csnpt-nav-utilities > a[href="/espace-professionnel"]::before { display: inline-block; width: 1rem; height: 1rem; margin-inline-end: .45rem; background: currentColor; content: ""; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M5 21v-2a7 7 0 0 1 14 0v2z'/%3E%3C/svg%3E") center / contain no-repeat; }
-.csnpt-nav-utilities > a[href="/espace-professionnel"]:hover { background: #0E5A5F !important; color: white !important; }
+.csnpt-nav-utilities > a[href="/espace-pro/login"] { min-height: 2.8rem; align-items: center; border: 1px solid #14272A; border-radius: 999px; background: transparent !important; padding-inline: 1rem; color: #14272A !important; }
+.csnpt-nav-utilities > a[href="/espace-pro/login"] svg { display: none; }
+.csnpt-nav-utilities > a[href="/espace-pro/login"]::before { display: inline-block; width: 1rem; height: 1rem; margin-inline-end: .45rem; background: currentColor; content: ""; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M5 21v-2a7 7 0 0 1 14 0v2z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.csnpt-nav-utilities > a[href="/espace-pro/login"]:hover { background: #0E5A5F !important; color: white !important; }
 .csnpt-nav-utilities button[aria-label="العربية"] { padding-inline: .45rem; color: #0E5A5F; }
 html[lang="ar"] .collage-caption { direction: rtl; }
 html[lang="ar"] .editorial-home { font-family: var(--font-arabic); }

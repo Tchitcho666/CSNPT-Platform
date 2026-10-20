@@ -47,7 +47,7 @@ const CONTENT = {
     information: 'INFORMATIONS',
     informationLinks: [
       ['Confidentialité', '/confidentialite'],
-      ['Espace professionnel', '/espace-professionnel'],
+      ['Espace professionnel', '/espace-pro/login'],
       ['Trousse de secours', '/trousse-secours'],
     ],
 
@@ -94,7 +94,7 @@ const CONTENT = {
     information: 'معلومات',
     informationLinks: [
       ['الخصوصية', '/confidentialite'],
-      ['الفضاء المهني', '/espace-professionnel'],
+      ['الفضاء المهني', '/espace-pro/login'],
       ['حقيبة الإسعاف النفسي الحركي', '/trousse-secours'],
     ],
 
@@ -141,7 +141,7 @@ const CONTENT = {
     information: 'INFORMATION',
     informationLinks: [
       ['Privacy', '/confidentialite'],
-      ['Professional area', '/espace-professionnel'],
+      ['Professional area', '/espace-pro/login'],
       ['First aid kit', '/trousse-secours'],
     ],
 

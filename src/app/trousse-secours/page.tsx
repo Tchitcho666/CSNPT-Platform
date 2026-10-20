@@ -9,7 +9,7 @@ const copy = {
     eyebrow: 'CSNPT · RESSOURCES',
     title: 'Trousse sensorielle',
     description: 'Cette page est réservée aux ressources rapides de la plateforme.',
-    empty: 'Aucun document n’est disponible ici pour le moment.',
+    empty: 'Aucun contenu pour le moment',
   },
   ar: {
     eyebrow: 'CSNPT · الموارد',

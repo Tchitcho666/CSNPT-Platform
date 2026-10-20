@@ -7,9 +7,9 @@ import useDocumentLanguage from '@/lib/useDocumentLanguage';
 import type { ListedResource } from '@/lib/data/resources.static';
 
 const copy = {
-  fr: { back: 'Retour aux ressources', eyebrow: 'BIBLIOTHÈQUE PROFESSIONNELLE', about: 'À propos de cette ressource', access: 'Accès', unavailable: 'Fichier non disponible', notice: 'Le fichier de cette ressource n’est pas disponible pour le moment.', browse: 'Explorer toutes les ressources', missing: 'Ressource introuvable', missingText: 'Cette ressource n’est pas disponible dans la bibliothèque actuelle.' },
-  ar: { back: 'العودة إلى الموارد', eyebrow: 'المكتبة المهنية', about: 'حول هذا المورد', access: 'الوصول', unavailable: 'الملف غير متاح', notice: 'ملف هذا المورد غير متاح في الوقت الحالي.', browse: 'استكشاف كل الموارد', missing: 'المورد غير موجود', missingText: 'هذا المورد غير متاح في المكتبة الحالية.' },
-  en: { back: 'Back to resources', eyebrow: 'PROFESSIONAL LIBRARY', about: 'About this resource', access: 'Access', unavailable: 'File unavailable', notice: 'The file for this resource is not available yet.', browse: 'Browse all resources', missing: 'Resource not found', missingText: 'This resource is not available in the current library.' },
+  fr: { back: 'Retour aux ressources', eyebrow: 'BIBLIOTHÈQUE PROFESSIONNELLE', about: 'À propos de cette ressource', access: 'Accès', unavailable: 'Bientôt disponible', notice: 'Le fichier de cette ressource sera disponible prochainement.', browse: 'Explorer toutes les ressources', missing: 'Ressource introuvable', missingText: 'Cette ressource n’est pas disponible dans la bibliothèque actuelle.' },
+  ar: { back: 'العودة إلى الموارد', eyebrow: 'المكتبة المهنية', about: 'حول هذا المورد', access: 'الوصول', unavailable: 'متاح قريبًا', notice: 'سيكون ملف هذا المورد متاحًا قريبًا.', browse: 'استكشاف كل الموارد', missing: 'المورد غير موجود', missingText: 'هذا المورد غير متاح في المكتبة الحالية.' },
+  en: { back: 'Back to resources', eyebrow: 'PROFESSIONAL LIBRARY', about: 'About this resource', access: 'Access', unavailable: 'Coming soon', notice: 'This resource file will be available soon.', browse: 'Browse all resources', missing: 'Resource not found', missingText: 'This resource is not available in the current library.' },
 } as const;
 
 export default function ResourceDetailView({ resource }: { resource: ListedResource | null }) {
@@ -49,7 +49,7 @@ export default function ResourceDetailView({ resource }: { resource: ListedResou
               <aside className="border-t border-[var(--line)] pt-4">
                 <h2 className="text-xs font-bold uppercase tracking-[.15em]">{t.access}</h2>
                 <p className="mt-4 text-sm text-[var(--muted)]">{resource.format}{resource.size ? ` · ${resource.size}` : ''}</p>
-                <p className="mt-6 border-s-2 border-[var(--terracotta)] ps-4 py-2 text-sm font-semibold" role="status">{t.unavailable}</p>
+                <p className="mt-6" role="status"><span className="inline-flex rounded-full bg-[#f0eee7] px-3 py-1.5 text-xs font-semibold text-[#5e6a66]">{t.unavailable}</span></p>
                 <p className="mt-3 text-xs leading-5 text-[var(--muted)]">{t.notice}</p>
               </aside>
             </section>

@@ -31,11 +31,12 @@ const text = {
     message: 'Message',
     messagePlaceholder: 'Écrivez votre message...',
     consent: 'J’accepte que les informations saisies soient utilisées uniquement pour traiter ma demande.',
+    privacy: 'Consulter la politique de confidentialité',
     required: 'Veuillez remplir tous les champs obligatoires.',
     invalidEmail: 'Veuillez saisir une adresse e-mail valide.',
     consentRequired: 'Votre consentement est nécessaire pour envoyer le message.',
-    send: 'Préparer le message',
-    sending: 'Préparation...',
+    send: 'Envoyer le message',
+    sending: 'Envoi...',
     directTitle: 'Nous contacter directement',
     phone: 'Téléphone',
     emailLabel: 'E-mail',
@@ -48,8 +49,8 @@ const text = {
     professionalTitle: 'Vous êtes professionnel ?',
     professionalText: 'L’espace professionnel regroupera les services liés au profil, à l’adhésion et à la pratique.',
     professionalButton: 'Espace professionnel',
-    successTitle: 'Message préparé',
-    successText: 'Votre logiciel de messagerie va s’ouvrir avec votre demande déjà préparée. Il ne reste plus qu’à confirmer l’envoi.',
+    successTitle: 'Votre message a été envoyé avec succès',
+    successText: 'La CSNPT a bien reçu votre message.',
     newMessage: 'Écrire un nouveau message',
     back: 'Retour',
   },
@@ -69,11 +70,12 @@ const text = {
     message: 'الرسالة',
     messagePlaceholder: 'اكتب رسالتك...',
     consent: 'نوافق أن تستعمل المعلومات المدخلة فقط لمعالجة طلبي.',
+    privacy: 'الاطلاع على سياسة الخصوصية',
     required: 'عمّر الخانات الإجبارية الكل.',
     invalidEmail: 'اكتب بريد إلكتروني صحيح.',
     consentRequired: 'لازم توافق قبل إرسال الرسالة.',
-    send: 'تحضير الرسالة',
-    sending: 'جاري التحضير...',
+    send: 'إرسال الرسالة',
+    sending: 'جارٍ الإرسال...',
     directTitle: 'اتصل بنا مباشرة',
     phone: 'الهاتف',
     emailLabel: 'البريد الإلكتروني',
@@ -86,8 +88,8 @@ const text = {
     professionalTitle: 'إنت مهني؟',
     professionalText: 'الفضاء المهني باش يجمع الخدمات المتعلقة بالملف المهني والانخراط والممارسة.',
     professionalButton: 'الفضاء المهني',
-    successTitle: 'الرسالة تحضّرت',
-    successText: 'باش يتحلّ برنامج البريد الإلكتروني والرسالة تكون محضّرة. يبقى عليك تأكيد الإرسال.',
+    successTitle: 'تم إرسال رسالتك بنجاح',
+    successText: 'توصلت CSNPT برسالتك.',
     newMessage: 'اكتب رسالة أخرى',
     back: 'رجوع',
   },
@@ -107,11 +109,12 @@ const text = {
     message: 'Message',
     messagePlaceholder: 'Write your message...',
     consent: 'I agree that the information entered may be used only to process my request.',
+    privacy: 'Read the privacy policy',
     required: 'Please complete all required fields.',
     invalidEmail: 'Please enter a valid email address.',
     consentRequired: 'Your consent is required before sending the message.',
-    send: 'Prepare message',
-    sending: 'Preparing...',
+    send: 'Send message',
+    sending: 'Sending...',
     directTitle: 'Contact us directly',
     phone: 'Phone',
     emailLabel: 'Email',
@@ -124,8 +127,8 @@ const text = {
     professionalTitle: 'Are you a professional?',
     professionalText: 'The professional area will bring together profile, membership and practice services.',
     professionalButton: 'Professional area',
-    successTitle: 'Message prepared',
-    successText: 'Your mail application will open with your request already prepared. You only need to confirm sending.',
+    successTitle: 'Your message was sent successfully',
+    successText: 'CSNPT has received your message.',
     newMessage: 'Write another message',
     back: 'Back',
   },
@@ -158,7 +161,7 @@ export default function ContactPage() {
     setError('');
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!form.name.trim() || !form.email.trim() || !form.subject || !form.message.trim()) {
@@ -178,15 +181,21 @@ export default function ContactPage() {
 
     setSending(true);
     setError('');
-
-    const subject = encodeURIComponent(`CSNPT — ${form.subject}`);
-    const body = encodeURIComponent(
-      `Nom et prénom: ${form.name}\nEmail: ${form.email}\nSujet: ${form.subject}\n\nMessage:\n${form.message}`,
-    );
-
-    window.location.href = `mailto:contact@csnpt.tn?subject=${subject}&body=${body}`;
-    setSubmitted(true);
-    setSending(false);
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, name: form.name.trim(), email: form.email.trim(), message: form.message.trim() }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) throw new Error(result.message || 'Votre message n’a pas pu être envoyé.');
+      setForm({ name: '', email: '', subject: '', message: '', consent: false });
+      setSubmitted(true);
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Votre message n’a pas pu être envoyé. Réessayez.');
+    } finally {
+      setSending(false);
+    }
   }
 
   function resetForm() {
@@ -321,7 +330,7 @@ export default function ContactPage() {
                         onChange={(e) => update('consent', e.target.checked)}
                         className="mt-1 h-4 w-4 accent-[#287d78]"
                       />
-                      <span>{t.consent}</span>
+                      <span>{t.consent} <Link href="/confidentialite" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#287d78] underline">{t.privacy}</Link></span>
                     </label>
 
                     {error && (
@@ -335,12 +344,12 @@ export default function ContactPage() {
                       disabled={sending}
                       className="rounded-2xl bg-[#164c5d] px-7 py-4 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60"
                     >
-                      {sending ? t.sending : t.send} ↗
+                      {sending ? t.sending : t.send}
                     </button>
                   </form>
                 </>
               ) : (
-                <div className="py-10">
+                <div role="status" aria-live="polite" className="py-10">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#dcebe6] text-xl text-[#287d78]">
                     ✓
                   </div>
@@ -410,7 +419,7 @@ export default function ContactPage() {
                 <h2 className="mt-4 text-2xl font-black">{t.professionalTitle}</h2>
                 <p className="mt-3 text-sm leading-7 text-[#68716e]">{t.professionalText}</p>
                 <Link
-                  href="/espace-professionnel"
+                  href="/espace-pro/login"
                   className="mt-6 inline-flex rounded-2xl border border-[#cfc8bc] px-5 py-3 text-sm font-bold"
                 >
                   {t.professionalButton} ↗

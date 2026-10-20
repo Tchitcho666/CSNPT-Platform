@@ -1,5 +1,12 @@
 import { getDatabaseClient } from '@/lib/server/db';
 import NewsIndex from '@/components/news/NewsIndex';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Actualités de la psychomotricité | CSNPT',
+  description: 'Les actualités, annonces et informations de la Chambre Syndicale Nationale des Psychomotriciens Tunisiens.',
+  openGraph: { title: 'Actualités | CSNPT', description: 'Les actualités et annonces du CSNPT.', images: ['/images/editorial/community-tunisia-gemini.png'] },
+};
 
 export const dynamic = 'force-dynamic';
 

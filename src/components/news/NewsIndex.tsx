@@ -10,7 +10,7 @@ import NewsCover from '@/components/news/NewsCover';
 export type NewsArticlePreview = { id: string; title: string; slug: string; excerpt: string; coverImage: string | null; publishedAt: string | null };
 
 const labels: Record<Lang, { eyebrow: string; title: string; intro: string; empty: string; read: string }> = {
-  fr: { eyebrow: 'CSNPT · PUBLICATIONS', title: 'Actualités CSNPT', intro: 'La vie institutionnelle et les publications de la chambre.', empty: 'Aucune actualité publiée pour le moment.', read: 'Lire l’article' },
+  fr: { eyebrow: 'CSNPT · PUBLICATIONS', title: 'Actualités CSNPT', intro: 'La vie institutionnelle et les publications de la chambre.', empty: 'Aucun contenu pour le moment', read: 'Lire l’article' },
   ar: { eyebrow: 'CSNPT · المستجدات', title: 'مستجدات CSNPT', intro: 'الحياة المؤسسية ومنشورات الغرفة.', empty: 'لا توجد مستجدات منشورة حالياً.', read: 'قراءة المقال' },
   en: { eyebrow: 'CSNPT · NEWS', title: 'CSNPT news', intro: 'Institutional life and publications from the chamber.', empty: 'There are no published articles yet.', read: 'Read article' },
 };

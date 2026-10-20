@@ -28,12 +28,13 @@ const copy = {
     message: 'Votre demande',
     messagePlaceholder: 'Je souhaite obtenir des informations concernant...',
     consent: 'J’accepte que les informations saisies soient utilisées uniquement pour traiter ma demande.',
-    send: 'Préparer ma demande',
+    privacy: 'Consulter la politique de confidentialité',
+    send: 'Envoyer ma demande',
     required: 'Veuillez remplir les champs obligatoires.',
     invalidEmail: 'Veuillez saisir une adresse e-mail valide.',
     consentRequired: 'Votre consentement est nécessaire.',
-            successTitle: 'Demande envoyée',
-    successText: 'Votre demande a été envoyée avec succès. Le comité CSNPT la traitera dans les plus brefs délais.',
+    successTitle: 'Votre demande a été envoyée avec succès',
+    successText: 'Le comité CSNPT la traitera dans les plus brefs délais.',
     newRequest: 'Nouvelle demande',
     infoTitle: 'À savoir',
     infoItems: [
@@ -69,13 +70,14 @@ const copy = {
     message: 'طلبك',
     messagePlaceholder: 'نحب نتحصل على معلومات بخصوص...',
     consent: 'نوافق أن تستعمل المعلومات فقط لمعالجة طلبي.',
-    send: 'تحضير الطلب',
+    privacy: 'الاطلاع على سياسة الخصوصية',
+    send: 'إرسال الطلب',
     required: 'عمّر الخانات الإجبارية.',
     invalidEmail: 'اكتب بريد إلكتروني صحيح.',
     consentRequired: 'لازم توافق قبل إرسال الطلب.',
-    successTitle: 'الطلب تحضّر',
+    successTitle: 'تم إرسال طلبك بنجاح',
     successText:
-      'باش يتحلّ برنامج البريد الإلكتروني والطلب يكون محضّر. راجع المعلومات وبعد أكّد الإرسال.',
+      'سيتولى مكتب CSNPT دراسة طلبك في أقرب الآجال.',
     newRequest: 'طلب جديد',
     infoTitle: 'معلومة مهمّة',
     infoItems: [
@@ -111,11 +113,12 @@ const copy = {
     message: 'Your request',
     messagePlaceholder: 'I would like information about...',
     consent: 'I agree that the information entered may be used only to process my request.',
+    privacy: 'Read the privacy policy',
     send: 'Send my request',
     required: 'Please complete the required fields.',
     invalidEmail: 'Please enter a valid email address.',
     consentRequired: 'Your consent is required.',
-    successTitle: 'Request prepared',
+    successTitle: 'Your request was sent successfully',
     successText:
       'Your request has been recorded. The committee will review your file and follow up according to the current procedure.',
     newRequest: 'New request',
@@ -197,10 +200,15 @@ export default function AdhesionPage() {
     setIsSubmitting(true);
     try {
       const result = await submitAdhesion(payload);
-      if (result.success) setSubmitted(true);
+      if (result.success) {
+        formRef.current?.reset();
+        setForm({ name: '', email: '', phone: '', status: '', message: '', consent: false });
+        setError('');
+        setSubmitted(true);
+      }
       else setError(result.message);
     } catch {
-      setError('La demande n?a pas pu ?tre envoy?e. R?essayez dans un instant.');
+      setError('La demande n’a pas pu être envoyée. Réessayez dans un instant.');
     } finally {
       setIsSubmitting(false);
     }
@@ -348,7 +356,7 @@ export default function AdhesionPage() {
 
                     <div className="grid gap-4 md:grid-cols-3">
                       {([
-                        ['diplomaFile', lang === 'ar' ? '???????' : lang === 'en' ? 'Diploma' : 'Dipl?me'],
+                        ['diplomaFile', lang === 'ar' ? 'شهادة' : lang === 'en' ? 'Diploma' : 'Diplôme'],
                         ['patenteFile', lang === 'ar' ? '?????????' : lang === 'en' ? 'Business licence' : 'Patente'],
                         ['rneFile', 'RNE'],
                       ] as const).map(([name, label]) => (
@@ -368,7 +376,7 @@ export default function AdhesionPage() {
                         onChange={(e) => update('consent', e.target.checked)}
                         className="mt-1 h-4 w-4 accent-[#287d78]"
                       />
-                      <span>{t.consent}</span>
+                      <span>{t.consent} <Link href="/confidentialite" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#287d78] underline">{t.privacy}</Link></span>
                     </label>
 
                     {error && (
@@ -382,12 +390,12 @@ export default function AdhesionPage() {
                       disabled={isSubmitting}
                       className="adhesion-submit rounded-2xl bg-[#C4623B] px-7 py-4 text-sm font-bold text-white hover:opacity-90"
                     >
-                      {t.send} ↗
+                      {t.send}
                     </button>
                   </form>
                 </>
               ) : (
-                <div className="py-10">
+                <div role="status" aria-live="polite" className="py-10">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#dcebe6] text-xl text-[#287d78]">
                     ✓
                   </div>

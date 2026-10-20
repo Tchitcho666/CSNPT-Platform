@@ -46,6 +46,74 @@ function revalidateEvents() {
   revalidateTag('events', 'max');
 }
 
+export async function updateInternshipStatusAction(formData: FormData) {
+  await requireAdmin();
+  const id = formData.get('id');
+  const status = formData.get('status');
+  if (typeof id !== 'string' || !id.trim() || id.length > 36 || !['APPROVED', 'REJECTED'].includes(String(status))) redirect('/admin?tab=stages&error=invalid');
+  try {
+    await getDatabaseClient().internshipRequest.update({ where: { id }, data: { status: String(status) } });
+  } catch (error) {
+    console.error('Internship status update failed:', error);
+    redirect('/admin?tab=stages&error=database');
+  }
+  revalidatePath('/admin');
+  redirect('/admin?tab=stages');
+}
+
+export async function createTeamMemberAction(formData: FormData) {
+  await requireAdmin();
+  try {
+    const fullName = requiredText(formData, 'fullName', 200);
+    const role = requiredText(formData, 'role', 160);
+    const biographyValue = formData.get('biography');
+    const imageValue = formData.get('image');
+    const yearsValue = formData.get('yearsActive');
+    const biography = typeof biographyValue === 'string' ? biographyValue.trim().slice(0, 3000) || null : null;
+    const image = typeof imageValue === 'string' ? imageValue.trim().slice(0, 1000) || null : null;
+    const yearsActive = typeof yearsValue === 'string' ? yearsValue.trim().slice(0, 80) || null : null;
+    if (image && !/^https:\/\//i.test(image) && !image.startsWith('/')) redirect('/admin?tab=team&error=invalid');
+    await getDatabaseClient().teamMember.create({ data: { fullName, role, biography, image, yearsActive, isPublished: true, isAlumni: formData.get('isAlumni') === 'on' } });
+  } catch (error) {
+    console.error('Team member creation failed:', error);
+    redirect('/admin?tab=team&error=database');
+  }
+  revalidatePath('/admin');
+  revalidatePath('/la-chambre');
+  redirect('/admin?tab=team');
+}
+
+export async function toggleTeamMemberAlumniAction(formData: FormData) {
+  await requireAdmin();
+  const id = formData.get('id');
+  const isAlumni = formData.get('isAlumni') === 'true';
+  if (typeof id !== 'string' || !id.trim() || id.length > 36) redirect('/admin?tab=team&error=invalid');
+  try {
+    await getDatabaseClient().teamMember.update({ where: { id }, data: { isAlumni } });
+  } catch (error) {
+    console.error('Team alumni status update failed:', error);
+    redirect('/admin?tab=team&error=database');
+  }
+  revalidatePath('/admin');
+  revalidatePath('/la-chambre');
+  redirect('/admin?tab=team');
+}
+
+export async function deleteTeamMemberAction(formData: FormData) {
+  await requireAdmin();
+  const id = formData.get('id');
+  if (typeof id !== 'string' || !id.trim() || id.length > 36) redirect('/admin?tab=team&error=invalid');
+  try {
+    await getDatabaseClient().teamMember.delete({ where: { id } });
+  } catch (error) {
+    console.error('Team member deletion failed:', error);
+    redirect('/admin?tab=team&error=database');
+  }
+  revalidatePath('/admin');
+  revalidatePath('/la-chambre');
+  redirect('/admin?tab=team');
+}
+
 export async function createEvent(formData: FormData): Promise<{ success: boolean; message: string }> {
   await requireAdmin();
   let title: string;

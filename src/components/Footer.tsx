@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import {
   MapPin,
@@ -49,6 +49,7 @@ const CONTENT = {
       ['Confidentialité', '/confidentialite'],
       ['Espace professionnel', '/espace-pro/login'],
       ['Trousse de secours', '/trousse-secours'],
+      ['Stages internationaux', '/stages'],
     ],
 
     membershipTitle: 'Adhésion & cotisation',
@@ -96,6 +97,7 @@ const CONTENT = {
       ['الخصوصية', '/confidentialite'],
       ['الفضاء المهني', '/espace-pro/login'],
       ['حقيبة الإسعاف النفسي الحركي', '/trousse-secours'],
+      ['التربصات الدولية', '/stages'],
     ],
 
     membershipTitle: 'الانخراط والمساهمات',
@@ -143,6 +145,7 @@ const CONTENT = {
       ['Privacy', '/confidentialite'],
       ['Professional area', '/espace-pro/login'],
       ['First aid kit', '/trousse-secours'],
+      ['International internships', '/stages'],
     ],
 
     membershipTitle: 'Membership & fees',
@@ -162,6 +165,7 @@ export default function Footer({
 }: FooterProps) {
   const t = CONTENT[currentLang];
   const isRtl = currentLang === 'ar';
+  const [uticaLogoFailed, setUticaLogoFailed] = useState(false);
 
   return (
     <footer
@@ -196,10 +200,12 @@ export default function Footer({
 
             <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-[#DCD6CB] py-3">
               <div className="flex items-center gap-2">
+                {!uticaLogoFailed && <img src="/utica-logo.png" alt="UTICA" className="h-8 w-auto" onError={() => setUticaLogoFailed(true)} />}
+                {uticaLogoFailed && <span className="text-sm font-black tracking-[0.12em] text-[#164c5d]">UTICA</span>}
                 <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#64706B]">Affilié à l’UTICA</span>
               </div>
               <span aria-hidden="true" className="hidden h-5 w-px bg-[#DCD6CB] sm:block" />
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-[#64706B]"><MapPin className="h-3.5 w-3.5 text-[#BD7252]" />Fièrement tunisien</span>
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-[#64706B]"><span aria-hidden="true">🇹🇳</span><MapPin className="h-3.5 w-3.5 text-[#BD7252]" />Fièrement tunisien</span>
             </div>
 
             <p className="mt-2 max-w-[310px] text-[12px] leading-6 text-[#64706B]">

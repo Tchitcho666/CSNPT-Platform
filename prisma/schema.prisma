@@ -98,7 +98,24 @@ model TeamMember {
   image       String?
   sortOrder   Int      @default(0)
   isPublished Boolean  @default(false)
+  isAlumni    Boolean  @default(false)
+  yearsActive String?
   createdAt   DateTime @default(now())
+}
+
+model InternshipRequest {
+  id               String   @id @default(cuid())
+  fullName         String
+  email            String
+  country          String
+  university       String
+  level            String
+  cvUrl            String?
+  motivationLetter String
+  status           String   @default("PENDING")
+  createdAt        DateTime @default(now())
+
+  @@index([status, createdAt])
 }
 
 model Milestone {

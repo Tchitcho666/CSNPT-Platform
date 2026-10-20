@@ -11,6 +11,8 @@ import RegistrationsTable from '@/components/admin/RegistrationsTable';
 import AdminOverview from '@/components/admin/AdminOverview';
 import NewsTable from '@/components/admin/NewsTable';
 import AddNewsForm from '@/components/admin/AddNewsForm';
+import InternshipTable from '@/components/admin/InternshipTable';
+import TeamMembersAdmin from '@/components/admin/TeamMembersAdmin';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,6 +53,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
   let events: Awaited<ReturnType<ReturnType<typeof getDatabaseClient>['event']['findMany']>> = [];
   let registrations: { id: string; fullName: string; email: string; phone: string; status: string; createdAt: Date; event: { title: string } }[] = [];
   let news: Awaited<ReturnType<ReturnType<typeof getDatabaseClient>['news']['findMany']>> = [];
+  let internships: Awaited<ReturnType<ReturnType<typeof getDatabaseClient>['internshipRequest']['findMany']>> = [];
+  let teamMembers: Awaited<ReturnType<ReturnType<typeof getDatabaseClient>['teamMember']['findMany']>> = [];
   let registrationCount = 0;
   let databaseAvailable = false;
   try {
@@ -62,6 +66,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
       db.eventRegistration.findMany({ include: { event: { select: { title: true } } }, orderBy: { createdAt: 'desc' } }),
       db.news.findMany({ orderBy: { createdAt: 'desc' } }),
       db.eventRegistration.count(),
+      db.internshipRequest.findMany({ orderBy: { createdAt: 'desc' } }),
+      db.teamMember.findMany({ orderBy: { sortOrder: 'asc' } }),
     ]);
     if (results[0].status === 'fulfilled') practitioners = results[0].value;
     else console.error('Admin practitioner query failed:', results[0].reason);
@@ -75,13 +81,17 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
     else console.error('Admin news query failed:', results[4].reason);
     if (results[5].status === 'fulfilled') registrationCount = results[5].value;
     else console.error('Admin registration count query failed:', results[5].reason);
+    if (results[6].status === 'fulfilled') internships = results[6].value;
+    else console.error('Admin internship query failed:', results[6].reason);
+    if (results[7].status === 'fulfilled') teamMembers = results[7].value;
+    else console.error('Admin team query failed:', results[7].reason);
     databaseAvailable = results.every((result) => result.status === 'fulfilled');
   } catch (error) {
     console.error('Admin database connection/query failed:', error);
     databaseAvailable = false;
   }
 
-  const activeTab = params.tab === 'directory' || params.tab === 'memberships' || params.tab === 'events' || params.tab === 'registrations' || params.tab === 'news' ? params.tab : 'overview';
+  const activeTab = params.tab === 'directory' || params.tab === 'memberships' || params.tab === 'events' || params.tab === 'registrations' || params.tab === 'news' || params.tab === 'stages' || params.tab === 'team' ? params.tab : 'overview';
   const monthlyCounts = new Map<string, number>();
   const now = new Date();
   for (let offset = 5; offset >= 0; offset -= 1) {
@@ -117,6 +127,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         <Link href="/admin?tab=events" aria-current={activeTab === 'events' ? 'page' : undefined} className={`pb-3 text-sm ${activeTab === 'events' ? 'border-b-2 border-[#0E5A5F] font-semibold text-[#0E5A5F]' : 'text-[#14272A]/65'}`}>Événements ({events.length})</Link>
         <Link href="/admin?tab=registrations" aria-current={activeTab === 'registrations' ? 'page' : undefined} className={`pb-3 text-sm ${activeTab === 'registrations' ? 'border-b-2 border-[#0E5A5F] font-semibold text-[#0E5A5F]' : 'text-[#14272A]/65'}`}>Inscriptions ({registrations.length})</Link>
         <Link href="/admin?tab=news" aria-current={activeTab === 'news' ? 'page' : undefined} className={`pb-3 text-sm ${activeTab === 'news' ? 'border-b-2 border-[#0E5A5F] font-semibold text-[#0E5A5F]' : 'text-[#14272A]/65'}`}>Actualités ({news.length})</Link>
+        <Link href="/admin?tab=stages" aria-current={activeTab === 'stages' ? 'page' : undefined} className={`pb-3 text-sm ${activeTab === 'stages' ? 'border-b-2 border-[#0E5A5F] font-semibold text-[#0E5A5F]' : 'text-[#14272A]/65'}`}>Stages ({internships.filter((request) => request.status === 'PENDING').length})</Link>
+        <Link href="/admin?tab=team" aria-current={activeTab === 'team' ? 'page' : undefined} className={`pb-3 text-sm ${activeTab === 'team' ? 'border-b-2 border-[#0E5A5F] font-semibold text-[#0E5A5F]' : 'text-[#14272A]/65'}`}>Équipe ({teamMembers.length})</Link>
       </nav>
 
       {activeTab === 'overview' ? (
@@ -159,12 +171,16 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
           </div>
           <RegistrationsTable registrations={registrations} disabled={!databaseAvailable} />
         </section>
-      ) : (
+      ) : activeTab === 'news' ? (
         <section className="py-7" aria-labelledby="news-title">
           <div><h2 id="news-title" className="font-serif text-2xl">Actualités</h2><p className="mt-1 text-sm text-[#14272A]/65">Rédigez, relisez et publiez les nouvelles de la CSNPT.</p></div>
           <NewsTable articles={news} disabled={!databaseAvailable} />
           <AddNewsForm disabled={!databaseAvailable} />
         </section>
+      ) : activeTab === 'stages' ? (
+        <section className="py-7" aria-labelledby="stages-title"><h2 id="stages-title" className="font-serif text-2xl">Demandes de stages internationaux</h2><InternshipTable requests={internships} disabled={!databaseAvailable} /></section>
+      ) : (
+        <TeamMembersAdmin members={teamMembers} disabled={!databaseAvailable} />
       )}
     </main>
   );

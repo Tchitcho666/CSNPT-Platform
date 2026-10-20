@@ -40,6 +40,7 @@ const labels = {
     news: "Actualités",
     resources: "Ressources",
     pro: "Espace pro",
+    chamber: "La Chambre",
     calm: "Apaisé",
     dys: "Aa",
     menu: "Menu",
@@ -57,6 +58,7 @@ const labels = {
     news: "الأخبار",
     resources: "الموارد",
     pro: "الفضاء المهني",
+    chamber: "الغرفة",
     calm: "هادئ",
     dys: "Aa",
     menu: "القائمة",
@@ -74,6 +76,7 @@ const labels = {
     news: "News",
     resources: "Resources",
     pro: "Professional",
+    chamber: "The Chamber",
     calm: "Calm",
     dys: "Aa",
     menu: "Menu",
@@ -143,6 +146,7 @@ export default function Navbar({
     { href: "/formations", label: t.training },
     { href: "/actualites", label: t.news },
     { href: "/ressources", label: t.resources },
+    { href: "/la-chambre", label: t.chamber },
   ];
 
   const active = (href: string) => {

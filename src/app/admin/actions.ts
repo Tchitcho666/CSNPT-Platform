@@ -313,6 +313,10 @@ async function savePrivateAdhesionFile(value: FormDataEntryValue | null, request
 }
 
 export async function submitAdhesion(formData: FormData): Promise<{ success: boolean; message: string }> {
+  // Silently accept honeypot submissions without saving documents or creating a record.
+  if (String(formData.get('website_url') ?? '').trim()) {
+    return { success: true, message: 'Votre demande a été envoyée avec succès.' };
+  }
   const savedFiles: string[] = [];
   try {
     const fullName = requiredText(formData, 'fullName', 200);

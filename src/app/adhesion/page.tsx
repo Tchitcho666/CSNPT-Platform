@@ -304,6 +304,7 @@ export default function AdhesionPage() {
                   <p className="mt-3 text-sm leading-7 text-[#68716e]">{t.formIntro}</p>
 
                   <form ref={formRef} onSubmit={submit} encType="multipart/form-data" className="mt-8 space-y-6">
+                    <input type="text" name="website_url" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ display: 'none' }} />
                     <div className="grid gap-6 md:grid-cols-2">
                       <label htmlFor="adhesion-full-name">
                         <span className="mb-2 block text-sm font-bold">{t.name} *</span>

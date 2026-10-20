@@ -163,6 +163,7 @@ export default function ContactPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const honeypot = String(new FormData(event.currentTarget).get('website_url') ?? '');
 
     if (!form.name.trim() || !form.email.trim() || !form.subject || !form.message.trim()) {
       setError(t.required);
@@ -185,7 +186,7 @@ export default function ContactPage() {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, name: form.name.trim(), email: form.email.trim(), message: form.message.trim() }),
+        body: JSON.stringify({ ...form, website_url: honeypot, name: form.name.trim(), email: form.email.trim(), message: form.message.trim() }),
       });
       const result = await response.json();
       if (!response.ok || !result.success) throw new Error(result.message || 'Votre message n’a pas pu être envoyé.');
@@ -273,6 +274,7 @@ export default function ContactPage() {
                   </p>
 
                   <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+                    <input type="text" name="website_url" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ display: 'none' }} />
                     <div className="grid gap-6 md:grid-cols-2">
                       <label htmlFor="contact-name" className="block">
                         <span className="mb-2 block text-sm font-semibold">{t.name} *</span>

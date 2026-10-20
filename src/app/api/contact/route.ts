@@ -22,6 +22,10 @@ export async function POST(request: Request) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return invalidRequest();
 
   const data = body as Record<string, unknown>;
+  // Fake success for bot submissions, without sending email or revealing the honeypot.
+  if (typeof data.website_url === 'string' && data.website_url.trim()) {
+    return NextResponse.json({ success: true, id: null });
+  }
   const { name, email, subject, message, consent } = data;
   if (
     typeof name !== 'string' || !name.trim() || name.trim().length > 200 ||

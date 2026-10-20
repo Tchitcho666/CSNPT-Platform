@@ -197,8 +197,6 @@ export default function Footer({
             <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-[#DCD6CB] py-3">
               <div className="flex items-center gap-2">
                 <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#64706B]">Affilié à l’UTICA</span>
-                <img src="/utica-logo.png" alt="UTICA" className="h-8 max-w-24 object-contain" onError={(event) => { event.currentTarget.style.display = 'none'; event.currentTarget.nextElementSibling?.classList.remove('hidden'); }} />
-                <span className="hidden text-[10px] font-bold tracking-[0.08em] text-[#0E5A5F]">UTICA</span>
               </div>
               <span aria-hidden="true" className="hidden h-5 w-px bg-[#DCD6CB] sm:block" />
               <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-[#64706B]"><MapPin className="h-3.5 w-3.5 text-[#BD7252]" />Fièrement tunisien</span>

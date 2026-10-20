@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import SensoryModeControl from "@/components/SensoryModeControl";
 import SensoryChatbot from "@/components/chatbot/SensoryChatbot";
 import SmoothScroll from "@/components/layout/SmoothScroll";
+import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "CSNPT — Chambre Syndicale Nationale des Psychomotriciens Tunisiens",
   description:
     "Plateforme professionnelle de la Chambre Syndicale Nationale des Psychomotriciens Tunisiens.",

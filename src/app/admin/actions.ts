@@ -70,8 +70,12 @@ export async function createEvent(formData: FormData): Promise<{ success: boolea
     audience = requiredText(formData, 'audience', 100);
     capacityValue = Number(formData.get('capacity'));
     date = new Date(`${dateValue}T00:00:00.000Z`);
-    if (!Number.isFinite(date.getTime()) || !/^\d{2}:\d{2}$/.test(startTime) || !/^\d{2}:\d{2}$/.test(endTime) || !Number.isInteger(capacityValue) || capacityValue < 1 || capacityValue > 100000) {
-      return { success: false, message: 'Vérifiez les informations saisies.' };
+    const validDate = /^\d{4}-\d{2}-\d{2}$/.test(dateValue) && Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === dateValue;
+    const validTimes = /^\d{2}:\d{2}$/.test(startTime) && /^\d{2}:\d{2}$/.test(endTime) && startTime < endTime;
+    const validType = ['Formation', 'Séminaire'].includes(type);
+    const validAudience = ['Adhérents', 'Public', 'Professionnels'].includes(audience);
+    if (!validDate || !validTimes || !validType || !validAudience || !Number.isInteger(capacityValue) || capacityValue < 1 || capacityValue > 100000) {
+      return { success: false, message: 'Vérifiez la date, les horaires, le type et la capacité.' };
     }
   } catch {
     return { success: false, message: 'Vérifiez les champs obligatoires.' };
@@ -290,6 +294,7 @@ type AdhesionFileField = typeof adhesionFileFields[number];
 async function savePrivateAdhesionFile(value: FormDataEntryValue | null, requestId: string, kind: AdhesionFileField) {
   if (!(value instanceof File) || value.size === 0) return null;
   if (value.size > 8 * 1024 * 1024) throw new Error('A file exceeds the 8 MB limit.');
+  if (!/\.(pdf|jpg|png)$/i.test(value.name)) throw new Error('Unsupported document extension.');
   const supportedTypes: Record<string, string> = { 'application/pdf': 'pdf', 'image/jpeg': 'jpg', 'image/png': 'png' };
   const extension = supportedTypes[value.type];
   if (!extension) throw new Error('Unsupported document format.');
@@ -336,9 +341,12 @@ export async function submitAdhesion(formData: FormData): Promise<{ success: boo
   } catch (error) {
     console.error('Adhesion submission failed:', error);
     await Promise.all(savedFiles.map((file) => unlink(path.join(process.cwd(), 'private_uploads', 'adhesions', file)).catch(() => undefined)));
-    return { success: false, message: error instanceof Error && error.message.includes('8 MB')
+    const message = error instanceof Error && error.message.includes('8 MB')
       ? 'Chaque document doit faire 8 Mo maximum.'
-      : 'La demande n’a pas pu être enregistrée. Vérifiez les documents puis réessayez.' };
+      : error instanceof Error && error.message.includes('Unsupported document')
+        ? 'Chaque document doit être au format PDF, JPG ou PNG et son contenu doit correspondre à son format.'
+        : 'La demande n’a pas pu être enregistrée. Vérifiez les documents puis réessayez.';
+    return { success: false, message };
   }
 }
 

@@ -274,9 +274,13 @@ export default function ContactPage() {
 
                   <form onSubmit={handleSubmit} className="mt-8 space-y-6">
                     <div className="grid gap-6 md:grid-cols-2">
-                      <label className="block">
+                      <label htmlFor="contact-name" className="block">
                         <span className="mb-2 block text-sm font-semibold">{t.name} *</span>
                         <input
+                          id="contact-name"
+                          name="name"
+                          required
+                          maxLength={200}
                           value={form.name}
                           onChange={(e) => update('name', e.target.value)}
                           placeholder={t.namePlaceholder}
@@ -284,10 +288,14 @@ export default function ContactPage() {
                         />
                       </label>
 
-                      <label className="block">
+                      <label htmlFor="contact-email" className="block">
                         <span className="mb-2 block text-sm font-semibold">{t.email} *</span>
                         <input
+                          id="contact-email"
+                          name="email"
                           type="email"
+                          required
+                          maxLength={254}
                           value={form.email}
                           onChange={(e) => update('email', e.target.value)}
                           placeholder={t.emailPlaceholder}
@@ -296,9 +304,12 @@ export default function ContactPage() {
                       </label>
                     </div>
 
-                    <label className="block">
+                    <label htmlFor="contact-subject" className="block">
                       <span className="mb-2 block text-sm font-semibold">{t.subject} *</span>
                       <select
+                        id="contact-subject"
+                        name="subject"
+                        required
                         value={form.subject}
                         onChange={(e) => update('subject', e.target.value)}
                         className="w-full rounded-2xl border border-[#d8d2c8] bg-[#faf8f3] px-4 py-3.5 outline-none focus:border-[#287d78]"
@@ -312,9 +323,13 @@ export default function ContactPage() {
                       </select>
                     </label>
 
-                    <label className="block">
+                    <label htmlFor="contact-message" className="block">
                       <span className="mb-2 block text-sm font-semibold">{t.message} *</span>
                       <textarea
+                        id="contact-message"
+                        name="message"
+                        required
+                        maxLength={5000}
                         value={form.message}
                         onChange={(e) => update('message', e.target.value)}
                         placeholder={t.messagePlaceholder}
@@ -323,9 +338,12 @@ export default function ContactPage() {
                       />
                     </label>
 
-                    <label className="flex cursor-pointer gap-3 rounded-2xl border border-[#ded9cf] bg-[#faf8f3] p-4 text-sm leading-6">
+                    <label htmlFor="contact-consent" className="flex cursor-pointer gap-3 rounded-2xl border border-[#ded9cf] bg-[#faf8f3] p-4 text-sm leading-6">
                       <input
+                        id="contact-consent"
+                        name="consent"
                         type="checkbox"
+                        required
                         checked={form.consent}
                         onChange={(e) => update('consent', e.target.checked)}
                         className="mt-1 h-4 w-4 accent-[#287d78]"
@@ -334,7 +352,7 @@ export default function ContactPage() {
                     </label>
 
                     {error && (
-                      <div className="rounded-2xl border border-[#d9a18a] bg-[#fff4ed] px-4 py-3 text-sm font-semibold text-[#8a432d]">
+                      <div role="alert" aria-live="polite" className="rounded-2xl border border-[#d9a18a] bg-[#fff4ed] px-4 py-3 text-sm font-semibold text-[#8a432d]">
                         {error}
                       </div>
                     )}

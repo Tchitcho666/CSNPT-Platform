@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 export default function NewsCover({ src, className = '' }: { src?: string | null; className?: string }) {
   const [failed, setFailed] = useState(!src);
@@ -12,5 +13,5 @@ export default function NewsCover({ src, className = '' }: { src?: string | null
       <path d="M450 20c-60 38-64 90-8 112 6-56 9-83 8-112Zm20 15c54 38 60 84 9 109-10-52-12-77-9-109Z" fill="#B7C8A6" fillOpacity=".65" />
     </svg>
   </div>;
-  return <img src={src} alt="" onError={() => setFailed(true)} className={`w-full object-cover ${className}`} />;
+  return <Image src={src} alt="" width={1200} height={720} sizes="100vw" unoptimized onError={() => setFailed(true)} className={`w-full object-cover ${className}`} />;
 }

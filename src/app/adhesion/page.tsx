@@ -33,6 +33,8 @@ const copy = {
     required: 'Veuillez remplir les champs obligatoires.',
     invalidEmail: 'Veuillez saisir une adresse e-mail valide.',
     consentRequired: 'Votre consentement est nécessaire.',
+    fileTooLarge: 'Chaque document doit faire 8 Mo maximum.',
+    invalidFileType: 'Formats acceptés : PDF, JPG ou PNG.',
     successTitle: 'Votre demande a été envoyée avec succès',
     successText: 'Le comité CSNPT la traitera dans les plus brefs délais.',
     newRequest: 'Nouvelle demande',
@@ -75,6 +77,8 @@ const copy = {
     required: 'عمّر الخانات الإجبارية.',
     invalidEmail: 'اكتب بريد إلكتروني صحيح.',
     consentRequired: 'لازم توافق قبل إرسال الطلب.',
+    fileTooLarge: 'يجب ألا يتجاوز حجم كل ملف 8 ميغابايت.',
+    invalidFileType: 'الصيغ المقبولة: PDF أو JPG أو PNG.',
     successTitle: 'تم إرسال طلبك بنجاح',
     successText:
       'سيتولى مكتب CSNPT دراسة طلبك في أقرب الآجال.',
@@ -118,6 +122,8 @@ const copy = {
     required: 'Please complete the required fields.',
     invalidEmail: 'Please enter a valid email address.',
     consentRequired: 'Your consent is required.',
+    fileTooLarge: 'Each document must be 8 MB or smaller.',
+    invalidFileType: 'Accepted formats: PDF, JPG, or PNG.',
     successTitle: 'Your request was sent successfully',
     successText:
       'Your request has been recorded. The committee will review your file and follow up according to the current procedure.',
@@ -176,6 +182,13 @@ export default function AdhesionPage() {
     setError('');
   }
 
+  function validateUpload(file?: File): string {
+    if (!file) return '';
+    if (file.size > 8 * 1024 * 1024) return t.fileTooLarge;
+    if (!/\.(pdf|jpg|png)$/i.test(file.name)) return t.invalidFileType;
+    return '';
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.status || !form.message.trim()) {
@@ -191,6 +204,15 @@ export default function AdhesionPage() {
       return;
     }
     const formElement = event.currentTarget;
+    const files = Array.from(formElement.querySelectorAll<HTMLInputElement>('input[type="file"]'));
+    for (const input of files) {
+      const fileError = validateUpload(input.files?.[0]);
+      if (fileError) {
+        setError(fileError);
+        input.focus();
+        return;
+      }
+    }
     const payload = new FormData(formElement);
     payload.set('fullName', form.name.trim());
     payload.set('email', form.email.trim());
@@ -283,11 +305,13 @@ export default function AdhesionPage() {
 
                   <form ref={formRef} onSubmit={submit} encType="multipart/form-data" className="mt-8 space-y-6">
                     <div className="grid gap-6 md:grid-cols-2">
-                      <label>
+                      <label htmlFor="adhesion-full-name">
                         <span className="mb-2 block text-sm font-bold">{t.name} *</span>
                         <input
                           name="fullName"
+                          id="adhesion-full-name"
                           required
+                          maxLength={200}
                           value={form.name}
                           onChange={(e) => update('name', e.target.value)}
                           placeholder={t.name}
@@ -295,12 +319,14 @@ export default function AdhesionPage() {
                         />
                       </label>
 
-                      <label>
+                      <label htmlFor="adhesion-email">
                         <span className="mb-2 block text-sm font-bold">{t.email} *</span>
                         <input
                           name="email"
+                          id="adhesion-email"
                           type="email"
                           required
+                          maxLength={254}
                           value={form.email}
                           onChange={(e) => update('email', e.target.value)}
                           placeholder="vous@exemple.tn"
@@ -310,11 +336,14 @@ export default function AdhesionPage() {
                     </div>
 
                     <div className="grid gap-6 md:grid-cols-2">
-                      <label>
+                      <label htmlFor="adhesion-phone">
                         <span className="mb-2 block text-sm font-bold">{t.phone}</span>
                         <input
                           name="phone"
+                          id="adhesion-phone"
+                          type="tel"
                           required
+                          maxLength={40}
                           value={form.phone}
                           onChange={(e) => update('phone', e.target.value)}
                           placeholder="+216 ..."
@@ -322,10 +351,11 @@ export default function AdhesionPage() {
                         />
                       </label>
 
-                      <label>
+                      <label htmlFor="adhesion-status">
                         <span className="mb-2 block text-sm font-bold">{t.status} *</span>
                         <select
                           name="professionalStatus"
+                          id="adhesion-status"
                           required
                           value={form.status}
                           onChange={(e) => update('status', e.target.value)}
@@ -341,11 +371,13 @@ export default function AdhesionPage() {
                       </label>
                     </div>
 
-                    <label>
+                    <label htmlFor="adhesion-message">
                       <span className="mb-2 block text-sm font-bold">{t.message} *</span>
                       <textarea
                         name="message"
+                        id="adhesion-message"
                         required
+                        maxLength={5000}
                         value={form.message}
                         onChange={(e) => update('message', e.target.value)}
                         placeholder={t.messagePlaceholder}
@@ -360,18 +392,20 @@ export default function AdhesionPage() {
                         ['patenteFile', lang === 'ar' ? '?????????' : lang === 'en' ? 'Business licence' : 'Patente'],
                         ['rneFile', 'RNE'],
                       ] as const).map(([name, label]) => (
-                        <label key={name} className="grid gap-2 text-sm font-bold">
+                        <label key={name} htmlFor={`adhesion-${name}`} className="grid gap-2 text-sm font-bold">
                           {label} <span className="font-normal text-[#68716e]">PDF, JPG, PNG (Max 8 Mo)</span>
-                          <input name={name} type="file" accept="application/pdf,image/jpeg,image/png" className="w-full rounded-xl border border-[#d8d2c8] bg-[#faf8f3] p-3 text-xs file:me-3 file:rounded-full file:border-0 file:bg-[#0E5A5F]/10 file:px-3 file:py-2 file:font-semibold file:text-[#0E5A5F]" />
+                          <input id={`adhesion-${name}`} name={name} type="file" accept=".pdf,.jpg,.png" onChange={(event) => setError(validateUpload(event.currentTarget.files?.[0]))} className="w-full rounded-xl border border-[#d8d2c8] bg-[#faf8f3] p-3 text-xs file:me-3 file:rounded-full file:border-0 file:bg-[#0E5A5F]/10 file:px-3 file:py-2 file:font-semibold file:text-[#0E5A5F]" />
                         </label>
                       ))}
                     </div>
 
-                    <label className="flex cursor-pointer gap-3 rounded-2xl border border-[#ded9cf] bg-[#faf8f3] p-4 text-sm leading-6">
+                    <label htmlFor="adhesion-consent" className="flex cursor-pointer gap-3 rounded-2xl border border-[#ded9cf] bg-[#faf8f3] p-4 text-sm leading-6">
                       <input
                         name="consent"
+                        id="adhesion-consent"
                         value="on"
                         type="checkbox"
+                        required
                         checked={form.consent}
                         onChange={(e) => update('consent', e.target.checked)}
                         className="mt-1 h-4 w-4 accent-[#287d78]"
@@ -380,7 +414,7 @@ export default function AdhesionPage() {
                     </label>
 
                     {error && (
-                      <div className="rounded-2xl border border-[#d9a18a] bg-[#fff4ed] px-4 py-3 text-sm font-semibold text-[#8a432d]">
+                      <div role="alert" aria-live="polite" className="rounded-2xl border border-[#d9a18a] bg-[#fff4ed] px-4 py-3 text-sm font-semibold text-[#8a432d]">
                         {error}
                       </div>
                     )}

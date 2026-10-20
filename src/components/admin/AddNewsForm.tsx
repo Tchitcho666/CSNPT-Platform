@@ -30,10 +30,10 @@ export default function AddNewsForm({ disabled = false }: { disabled?: boolean }
     <form ref={formRef} action={submit} className="mt-8 grid gap-4 border-t border-[#14272A]/15 pt-6 md:grid-cols-2" aria-labelledby="add-news-title">
       <div className="md:col-span-2"><h3 id="add-news-title" className="font-serif text-xl">Nouvel article</h3><p className="mt-1 text-sm text-[#14272A]/65">L’article est créé en brouillon. Publiez-le après relecture.</p></div>
       <fieldset disabled={disabled} className="contents">
-        <label className="grid gap-1.5 text-sm">Titre<input name="title" required maxLength={200} className={fieldClass} /></label>
-        <label className="grid gap-1.5 text-sm">Image de couverture (URL)<input name="coverImage" type="url" maxLength={2000} className={fieldClass} placeholder="https://…" /></label>
-        <label className="grid gap-1.5 text-sm md:col-span-2">Résumé<textarea name="excerpt" required maxLength={500} rows={2} className={fieldClass} /></label>
-        <label className="grid gap-1.5 text-sm md:col-span-2">Contenu<textarea name="content" required maxLength={30000} rows={8} className={fieldClass} /></label>
+        <label htmlFor="news-title" className="grid gap-1.5 text-sm">Titre<input id="news-title" name="title" required maxLength={200} className={fieldClass} /></label>
+        <label htmlFor="news-cover" className="grid gap-1.5 text-sm">Image de couverture (URL)<input id="news-cover" name="coverImage" type="url" maxLength={2000} className={fieldClass} placeholder="https://…" /></label>
+        <label htmlFor="news-excerpt" className="grid gap-1.5 text-sm md:col-span-2">Résumé<textarea id="news-excerpt" name="excerpt" required maxLength={500} rows={2} className={fieldClass} /></label>
+        <label htmlFor="news-content" className="grid gap-1.5 text-sm md:col-span-2">Contenu<textarea id="news-content" name="content" required maxLength={30000} rows={8} className={fieldClass} /></label>
         <div className="md:col-span-2"><SubmitButton /></div>
       </fieldset>
       {message && <p className={`text-sm md:col-span-2 ${message.ok ? 'text-[#0E5A5F]' : 'text-red-700'}`} role={message.ok ? 'status' : 'alert'}>{message.text}</p>}

@@ -108,7 +108,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
       {!databaseAvailable && <p className="mt-6 border-l-2 border-[#C4623B] bg-white/60 px-4 py-3 text-sm" role="status">Base de données indisponible. Configurez DATABASE_URL et appliquez le schéma Prisma pour gérer les dossiers.</p>}
       {params.error === 'database' && <p className="mt-4 text-sm text-red-800" role="alert">L’opération a échoué. Vérifiez la connexion à la base de données puis réessayez.</p>}
       {params.notice === 'created' && <p className="mt-4 text-sm text-[#0E5A5F]" role="status">Le professionnel a été ajouté en brouillon.</p>}
-      {params.notice === 'test-records-cleaned' && <p className="mt-4 text-sm text-[#0E5A5F]" role="status">Nettoyage terminé : {Number(params.deleted) || 0} fiche(s) « Dr. Test » supprimée(s).</p>}
+      {params.notice === 'test-records-cleaned' && <p className="mt-4 text-sm text-[#0E5A5F]" role="status">Nettoyage terminé : {Number(params.deleted) || 0} fiche(s) de test supprimée(s).</p>}
 
       <nav aria-label="Sections d’administration" className="mt-7 flex gap-6 border-b border-[#14272A]/15">
         <Link href="/admin?tab=overview" aria-current={activeTab === 'overview' ? 'page' : undefined} className={`pb-3 text-sm ${activeTab === 'overview' ? 'border-b-2 border-[#0E5A5F] font-semibold text-[#0E5A5F]' : 'text-[#14272A]/65'}`}>Vue d’ensemble</Link>
@@ -129,7 +129,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
           </div>
           <AdminTable practitioners={practitioners} disabled={!databaseAvailable} />
           <form action={deleteDrTestPractitionersAction} className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-amber-700/25 bg-amber-50 px-4 py-4">
-            <p className="text-sm text-[#14272A]/75">Supprimer uniquement les fiches de test portant exactement le nom « Dr. Test ».</p>
+            <p className="text-sm text-[#14272A]/75">Supprimer uniquement la fiche professionnelle de test identifiée par son nom exact.</p>
             <button disabled={!databaseAvailable} className="rounded-full border border-amber-800/40 px-4 py-2 text-sm font-semibold text-amber-900 disabled:opacity-40">Supprimer les données de test</button>
           </form>
           <AddPractitionerForm disabled={!databaseAvailable} />

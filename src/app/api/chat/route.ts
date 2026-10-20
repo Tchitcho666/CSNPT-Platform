@@ -9,9 +9,19 @@ const SYSTEM_INSTRUCTION =
 type HistoryMessage = { role: 'user' | 'model'; text: string };
 
 export async function POST(request: Request) {
+  const maxRequestBytes = 96 * 1024;
+  const contentLength = Number(request.headers.get('content-length') || 0);
+  if (contentLength > maxRequestBytes) {
+    return NextResponse.json({ error: 'The chat request is too large.' }, { status: 413 });
+  }
+
   let parsedBody: unknown;
   try {
-    parsedBody = await request.json();
+    const rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > maxRequestBytes) {
+      return NextResponse.json({ error: 'The chat request is too large.' }, { status: 413 });
+    }
+    parsedBody = JSON.parse(rawBody);
   } catch {
     return NextResponse.json({ error: 'Invalid JSON request.' }, { status: 400 });
   }
@@ -53,7 +63,7 @@ export async function POST(request: Request) {
 
   try {
     // The installed @google/genai SDK expects an options object here.
-    const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const genAI = new GoogleGenAI({ apiKey });
     const response = await genAI.models.generateContent({
       model: 'gemini-3.8-flash',
       contents: [...history, { role: 'user', parts: [{ text: message }] }],

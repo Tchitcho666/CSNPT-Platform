@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -82,17 +83,23 @@ function MovementArtwork() {
       <div className="art-terra-circle absolute left-[29%] top-[5%] aspect-square w-[42%] rounded-full bg-[#C4623B]" />
       <div className="art-teal-leaf absolute right-[10%] top-[21%] h-[39%] w-[18%] rotate-[35deg] rounded-[100%_0_100%_0] bg-[#0E5A5F]" />
       <div className="art-photo-one calm-hidden absolute left-[24%] top-[12%] h-[68%] w-[47%] overflow-hidden rounded-[48%_48%_18%_18%]">
-        <img
+        <Image
           src="https://images.unsplash.com/photo-1544413660-299165566b1d?q=80&w=900&auto=format&fit=crop"
           alt=""
+          fill
+          sizes="(max-width: 780px) 100vw, 360px"
+          unoptimized
           className="h-full w-full object-cover object-center mix-blend-multiply opacity-80"
           loading="eager"
         />
       </div>
       <div className="art-photo-two calm-hidden absolute bottom-[7%] right-[10%] h-[35%] w-[27%] overflow-hidden rounded-t-[48%]">
-        <img
+        <Image
           src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=700&auto=format&fit=crop"
           alt=""
+          fill
+          sizes="(max-width: 780px) 30vw, 210px"
+          unoptimized
           className="h-full w-full object-cover object-center mix-blend-multiply opacity-75"
           loading="lazy"
         />
@@ -322,9 +329,12 @@ export default function EditorialHome() {
             </div>
           </div>
           <div className="calm-hidden relative min-h-[210px] overflow-hidden rounded-[45%_0_0_0] lg:col-span-3 lg:min-h-[290px]">
-            <img
+            <Image
               src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=900&auto=format&fit=crop"
               alt="Architecture méditerranéenne et porte traditionnelle"
+              fill
+              sizes="(max-width: 780px) 100vw, 50vw"
+              unoptimized
               className="absolute inset-0 h-full w-full object-cover mix-blend-luminosity opacity-75"
               loading="lazy"
             />

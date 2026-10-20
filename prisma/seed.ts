@@ -1,8 +1,13 @@
-import { PrismaLibSql } from '@prisma/adapter-libsql';
-import { PrismaClient } from '../src/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
 import { PRACTITIONERS } from '../src/lib/data';
 
-const prisma = new PrismaClient({ adapter: new PrismaLibSql({ url: 'file:./prisma/dev.db' }) });
+const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
+if (!connectionString) throw new Error('DIRECT_URL or DATABASE_URL must be configured to seed PostgreSQL.');
+
+const pool = new Pool({ connectionString });
+const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
 const knownGovernorates: Record<string, string> = {
   tunis: 'tunis',

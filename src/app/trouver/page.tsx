@@ -1,6 +1,8 @@
 import DirectoryPage from '@/components/DirectoryPage';
 import { getPublicPractitioners } from '@/lib/services/directory';
 
+export const dynamic = 'force-dynamic';
+
 type DirectorySearchParams = {
   q?: string | string[];
   gov?: string | string[];

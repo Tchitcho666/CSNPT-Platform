@@ -1,0 +1,552 @@
+'use client';
+
+import React, { useState } from 'react';
+import { 
+  Calendar, 
+  Clock, 
+  MapPin, 
+  Users, 
+  CheckCircle2, 
+  Ticket, 
+  ArrowRight, 
+  X, 
+  Sparkles,
+  Info,
+  CalendarPlus,
+  Share2
+} from 'lucide-react';
+import { I18N_DATA, SETTINGS } from '@/lib/data';
+import { Lang, ClinicalEvent } from '@/lib/types';
+
+// Jeu de données représentatif aligné sur les statuts de la Chambre
+const CLINICAL_EVENTS: ClinicalEvent[] = [
+  {
+    id: 'evt-mira',
+    title: {
+      fr: 'Séminaire Clinique : Cotation et Passation du Test de Mira Stambak',
+      ar: 'الملتقى السريري : تطبيق وتنقيط اختبار الإيقاع لميرا ستامباك',
+      en: 'Clinical Masterclass: Administration of the Mira Stambak Rhythm Test',
+    },
+    category: { 
+      fr: 'Évaluation & Bilans', 
+      ar: 'تقييم واختبارات سريرية', 
+      en: 'Diagnostic Batteries' 
+    },
+    animators: {
+      fr: 'Hela Ben Younes, Khouloud Dziri & Mounira Farhat (Bureau Exécutif CSNPT)',
+      ar: 'تأطير : هالة بن يونس، خلود الدزيري، ومنيرة فرحات (المكتب التنفيذي للغرفة)',
+      en: 'Led by Hela Ben Younes, Khouloud Dziri & Mounira Farhat (CSNPT Board)',
+    },
+    dateFormatted: { fr: '27 Avril 2026', ar: '27 أفريل 2026', en: 'April 27, 2026' },
+    targetIsoDate: '2026-04-27T09:00:00',
+    timeSlot: '09:00 - 13:00',
+    location: {
+      fr: "Siège de l'UTICA, Salle des Conférences, Cité El Khadra, Tunis",
+      ar: 'مقر الاتحاد التونسي للصناعة والتجارة UTICA، قاعة المؤتمرات، حي الخضراء، تونس',
+      en: 'UTICA Headquarters, Conference Auditorium, Tunis',
+    },
+    governorate: 'Tunis',
+    priceNonMember: 50,
+    priceMember: 30,
+    isAccreditedFree: true,
+    totalSeats: 50,
+    remainingSeats: 14,
+  },
+  {
+    id: 'evt-secours',
+    title: {
+      fr: 'Formation Pratique : Secourisme Pédiatrique & Urgences en Cabinet',
+      ar: 'دورة تطبيقية : الإسعافات الأولية للأطفال وحالات الطوارئ بالعيادة',
+      en: 'Hands-On Certification: Pediatric First Aid & Clinical Emergencies',
+    },
+    category: { 
+      fr: 'Urgences & Sécurité', 
+      ar: 'طوارئ وإسعاف طبي', 
+      en: 'Emergency & Safety' 
+    },
+    animators: {
+      fr: 'Instructeurs Certifiés PCMET & Urgentistes Pédiatriques',
+      ar: 'مدربون معتمدون من PCMET وأطباء طوارئ أطفال',
+      en: 'Certified PCMET Instructors & Pediatric Emergency Physicians',
+    },
+    dateFormatted: { fr: '16-17 Mai 2026', ar: '16-17 ماي 2026', en: 'May 16-17, 2026' },
+    targetIsoDate: '2026-05-16T08:30:00',
+    timeSlot: '08:30 - 16:30',
+    location: {
+      fr: 'Centre de Formation Médicale, Ariana',
+      ar: 'مركز التكوين الطبي التخصصي، أريانة',
+      en: 'Medical Simulation Center, Ariana',
+    },
+    governorate: 'Ariana',
+    priceNonMember: 160,
+    priceMember: 120,
+    isAccreditedFree: false,
+    totalSeats: 35,
+    remainingSeats: 7,
+  },
+  {
+    id: 'evt-pecs',
+    title: {
+      fr: 'Atelier de Structuration Visuelle PECS & Communication Fonctionnelle',
+      ar: 'ورشة التنظيم البصري PECS والتواصل الوظيفي',
+      en: 'Practical Workshop: PECS Implementation & Functional Communication',
+    },
+    category: { 
+      fr: 'Interventions TSA', 
+      ar: 'تأهيل طيف التوحد', 
+      en: 'Autism Interventions' 
+    },
+    animators: {
+      fr: 'Mme Inès Chahed & Experts en Communication Alternative',
+      ar: 'أ. إيناس الشاهد وخبراء التواصل البديل والمساند',
+      en: 'Ms. Ines Chahed & Augmentative Communication Specialists',
+    },
+    dateFormatted: { fr: '06 Juin 2026', ar: '06 جوان 2026', en: 'June 06, 2026' },
+    targetIsoDate: '2026-06-06T09:00:00',
+    timeSlot: '09:00 - 14:00',
+    location: {
+      fr: 'Espace Universitaire Médical, Sfax',
+      ar: 'المركب الجامعي الطبي، صفاقس',
+      en: 'Medical Academic Complex, Sfax',
+    },
+    governorate: 'Sfax',
+    priceNonMember: 90,
+    priceMember: 60,
+    isAccreditedFree: true,
+    totalSeats: 40,
+    remainingSeats: 26,
+  },
+];
+
+interface ClinicalEventsProps {
+  currentLang?: Lang;
+}
+
+export default function ClinicalEvents({ currentLang = 'fr' }: ClinicalEventsProps) {
+  const t = I18N_DATA[currentLang];
+  const isRtl = currentLang === 'ar';
+
+  const [activeBookingModal, setActiveBookingModal] = useState<ClinicalEvent | null>(null);
+  const [bookingStep, setBookingStep] = useState<1 | 2 | 3>(1);
+  const [ticketCount, setTicketCount] = useState<number>(1);
+  const [participantData, setParticipantData] = useState({
+    fullName: '',
+    phone: '',
+    email: '',
+    isMember: false,
+  });
+  const [generatedRef, setGeneratedRef] = useState<string | null>(null);
+
+  const openBooking = (event: ClinicalEvent) => {
+    setActiveBookingModal(event);
+    setBookingStep(1);
+    setTicketCount(1);
+    setGeneratedRef(null);
+  };
+
+  const closeBooking = () => {
+    setActiveBookingModal(null);
+    setBookingStep(1);
+    setParticipantData({ fullName: '', phone: '', email: '', isMember: false });
+  };
+
+  const handleNextStep = () => {
+    if (bookingStep === 1) {
+      setBookingStep(2);
+    } else if (bookingStep === 2) {
+      const reference = `CSNPT-SEM-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+      setGeneratedRef(reference);
+      setBookingStep(3);
+    }
+  };
+
+  return (
+    <section
+      id="events"
+      aria-label={t.navEvents}
+      className="relative z-10 bg-[#FAF7F2] py-16 sm:py-24 border-b border-[#E8DFD5] scroll-mt-20"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* En-tête de section institutionnelle */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#7A9B76]/15 border border-[#7A9B76]/30 text-xs font-semibold text-[#5A8A82] mb-3">
+              <Calendar className="w-3.5 h-3.5 stroke-[2]" />
+              <span>03 // FORMATION CONTINUE & BILLETTERIE</span>
+            </div>
+            
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2A2622] tracking-tight">
+              {currentLang === 'ar'
+                ? 'الملتقيات العلمية والدورات التكوينية بمقر UTICA'
+                : 'Séminaires Scientifiques & Billetterie UTICA'}
+            </h2>
+            
+            <p className="mt-3 text-sm sm:text-base text-[#2A2622]/70 leading-relaxed font-normal">
+              {currentLang === 'ar'
+                ? 'جلسات حضورية متخصصة لتطوير الكفاءات السريرية، بروتوكولات الاختبارات، والتشخيص الحركي.'
+                : 'Sessions de perfectionnement clinique animées par le collège scientifique au siège de l’UTICA. Réservation simplifiée et sécurisée.'}
+            </p>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-2 text-xs font-medium text-[#2A2622]/65 bg-[#F4EFEA] px-4 py-2.5 rounded-2xl border border-[#E8DFD5]">
+            <Info className="w-4 h-4 text-[#5A8A82]" />
+            <span>
+              {currentLang === 'ar'
+                ? 'تخفيض تلقائي للمنخرطين ومجانية للأعضاء المعتمدين'
+                : 'Tarifs préférentiels membres et accès libre accrédité'}
+            </span>
+          </div>
+        </div>
+
+        {/* Grille des événements cliniques */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+          {CLINICAL_EVENTS.map((event) => {
+            const isSoldOut = event.remainingSeats === 0;
+            const progressRatio = ((event.totalSeats - event.remainingSeats) / event.totalSeats) * 100;
+
+            return (
+              <div
+                key={event.id}
+                className="flex flex-col justify-between rounded-3xl border border-[#E8DFD5] bg-[#F4EFEA] p-7 shadow-sensory-sm transition-all duration-300 hover:border-[#7A9B76]/40"
+              >
+                <div>
+                  
+                  {/* Badges de statut et de catégorie */}
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-[#7A9B76]/15 text-[#5A8A82] border border-[#7A9B76]/30">
+                      {event.category[currentLang]}
+                    </span>
+                    
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                      isSoldOut
+                        ? 'bg-[#E8DFD5] text-[#2A2622]/50 border-transparent'
+                        : 'bg-[#FAF7F2] text-[#7A9B76] border-[#7A9B76]/30'
+                    }`}>
+                      {isSoldOut 
+                        ? (currentLang === 'ar' ? 'مكتمل' : 'Complet')
+                        : `${event.remainingSeats} ${currentLang === 'ar' ? 'مقاعد شاغرة' : 'places restantes'}`}
+                    </span>
+                  </div>
+
+                  {/* Titre du séminaire */}
+                  <h3 className="text-lg font-bold text-[#2A2622] leading-snug mb-2">
+                    {event.title[currentLang]}
+                  </h3>
+                  
+                  <p className="text-xs text-[#2A2622]/65 mb-6 font-normal leading-relaxed line-clamp-2">
+                    {event.animators[currentLang]}
+                  </p>
+
+                  {/* Coordonnées spatio-temporelles */}
+                  <div className="space-y-2.5 rounded-2xl bg-[#FAF7F2] p-4 border border-[#E8DFD5]/70 text-xs mb-6">
+                    <div className="flex items-center gap-2.5 text-[#2A2622]/80">
+                      <Calendar className="w-3.5 h-3.5 text-[#C67B5C] shrink-0" />
+                      <span className="font-semibold">{event.dateFormatted[currentLang]}</span>
+                      <span className="text-[#2A2622]/40">•</span>
+                      <span>{event.timeSlot}</span>
+                    </div>
+                    
+                    <div className="flex items-start gap-2.5 text-[#2A2622]/70 leading-relaxed">
+                      <MapPin className="w-3.5 h-3.5 text-[#5A8A82] shrink-0 mt-0.5" />
+                      <span>{event.location[currentLang]}</span>
+                    </div>
+                  </div>
+
+                  {/* Indicateur de jauge organique */}
+                  <div className="mb-6">
+                    <div className="flex justify-between text-[11px] text-[#2A2622]/60 font-medium mb-1.5">
+                      <span>{currentLang === 'ar' ? 'نسبة التسجيل' : 'Disponibilité'}</span>
+                      <span className="font-mono text-xs font-bold text-[#2A2622]">
+                        {event.totalSeats - event.remainingSeats} / {event.totalSeats}
+                      </span>
+                    </div>
+                    <div className="h-1.5 w-full bg-[#E8DFD5] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-[#5A8A82] rounded-full transition-all duration-700"
+                        style={{ width: `${progressRatio}%` }}
+                      />
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Bloc Tarifs & Déclencheur de Réservation */}
+                <div className="pt-4 border-t border-[#E8DFD5]">
+                  <div className="flex items-baseline justify-between mb-4">
+                    <div>
+                      <span className="text-[10px] text-[#2A2622]/50 block font-medium">
+                        {currentLang === 'ar' ? 'غير منخرط' : 'Standard'}
+                      </span>
+                      <span className="font-mono text-xs font-semibold text-[#2A2622]/70">
+                        {event.priceNonMember} TND
+                      </span>
+                    </div>
+
+                    <div className="text-end">
+                      <span className="text-[10px] text-[#5A8A82] block font-bold">
+                        {currentLang === 'ar' ? 'تعريفة المنخرطين' : 'Membre CSNPT'}
+                      </span>
+                      <span className="font-mono text-xl font-bold text-[#2A2622]">
+                        {event.priceMember} TND
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={isSoldOut}
+                    onClick={() => openBooking(event)}
+                    className={`w-full min-h-[48px] rounded-xl text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+                      isSoldOut
+                        ? 'bg-[#E8DFD5] text-[#2A2622]/40 cursor-not-allowed'
+                        : 'bg-[#5A8A82] hover:bg-[#4E7770] text-[#FAF7F2] shadow-sensory-sm'
+                    }`}
+                  >
+                    <Ticket className="w-4 h-4 stroke-[2]" />
+                    <span>
+                      {isSoldOut 
+                        ? (currentLang === 'ar' ? 'اكتملت المقاعد' : 'Session Complète') 
+                        : (currentLang === 'ar' ? 'حجز التذكرة' : 'Réserver une place')}
+                    </span>
+                  </button>
+                </div>
+
+              </div>
+            );
+          })}
+        </div>
+
+      </div>
+
+      {/* ── MODALE SENSORIELLE DE RÉSERVATION (FLUX EN 3 ÉTAPES) ── */}
+      {activeBookingModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2A2622]/40 backdrop-blur-sm animate-in"
+        >
+          <div className="w-full max-w-lg rounded-3xl bg-[#FAF7F2] border border-[#E8DFD5] p-6 sm:p-8 shadow-sensory-lg relative text-[#2A2622]">
+            
+            {/* Bouton de fermeture accessible */}
+            <button
+              type="button"
+              onClick={closeBooking}
+              className="absolute top-5 right-5 p-2 rounded-xl text-[#2A2622]/50 hover:bg-[#F4EFEA] transition-colors"
+              aria-label="Fermer la fenêtre"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Indicateur visuel d'étape (Stepping) */}
+            <div className="flex items-center gap-2 mb-6">
+              {[1, 2, 3].map((step) => (
+                <div
+                  key={step}
+                  className={`h-1.5 flex-1 rounded-full transition-colors duration-500 ${
+                    bookingStep >= step ? 'bg-[#5A8A82]' : 'bg-[#E8DFD5]'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Étape 1 : Nombre de places */}
+            {bookingStep === 1 && (
+              <div className="space-y-6">
+                <div>
+                  <span className="text-[11px] font-bold text-[#5A8A82] uppercase tracking-wider block mb-1">
+                    Étape 1 sur 3 // Sélection
+                  </span>
+                  <h3 className="text-xl font-bold tracking-tight">
+                    {activeBookingModal.title[currentLang]}
+                  </h3>
+                </div>
+
+                <div className="rounded-2xl bg-[#F4EFEA] p-4 border border-[#E8DFD5] space-y-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-[#2A2622]/60">Date :</span>
+                    <span className="font-semibold">{activeBookingModal.dateFormatted[currentLang]}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#2A2622]/60">Lieu :</span>
+                    <span className="font-semibold truncate max-w-[240px]">{activeBookingModal.location[currentLang]}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-2xl border border-[#E8DFD5]">
+                  <div>
+                    <span className="font-bold text-sm block">Nombre d’inscriptions</span>
+                    <span className="text-xs text-[#2A2622]/60">Plafond : 4 places par titulaire</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setTicketCount(Math.max(1, ticketCount - 1))}
+                      className="w-10 h-10 rounded-xl bg-[#F4EFEA] border border-[#E8DFD5] text-[#2A2622] font-bold text-base flex items-center justify-center hover:bg-[#E8DFD5] transition-colors"
+                    >
+                      -
+                    </button>
+                    <span className="font-mono text-base font-bold w-6 text-center">
+                      {ticketCount}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setTicketCount(Math.min(4, ticketCount + 1))}
+                      className="w-10 h-10 rounded-xl bg-[#F4EFEA] border border-[#E8DFD5] text-[#2A2622] font-bold text-base flex items-center justify-center hover:bg-[#E8DFD5] transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-[#E8DFD5]">
+                  <div>
+                    <span className="text-[11px] text-[#2A2622]/60 block font-medium">Montant estimé :</span>
+                    <span className="font-mono text-2xl font-bold text-[#5A8A82]">
+                      {activeBookingModal.priceMember * ticketCount} TND
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="min-h-[48px] px-6 rounded-xl bg-[#5A8A82] hover:bg-[#4E7770] text-[#FAF7F2] text-xs font-semibold transition-all flex items-center gap-2 shadow-sensory-sm"
+                  >
+                    <span>Continuer</span>
+                    <ArrowRight className="w-4 h-4 stroke-[2]" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Étape 2 : Identité clinique du participant */}
+            {bookingStep === 2 && (
+              <div className="space-y-5">
+                <div>
+                  <span className="text-[11px] font-bold text-[#5A8A82] uppercase tracking-wider block mb-1">
+                    Étape 2 sur 3 // Titulaire
+                  </span>
+                  <h3 className="text-xl font-bold tracking-tight">Coordonnées du participant</h3>
+                </div>
+
+                <div className="space-y-3.5">
+                  <div>
+                    <label className="text-xs font-bold text-[#2A2622]/80 block mb-1">
+                      Nom et Prénom du praticien :
+                    </label>
+                    <input
+                      type="text"
+                      value={participantData.fullName}
+                      onChange={(e) => setParticipantData({ ...participantData, fullName: e.target.value })}
+                      placeholder="ex. Mme Ameni Ben Amor"
+                      className="w-full bg-[#F4EFEA] border border-[#E8DFD5] rounded-xl px-4 py-3 text-xs text-[#2A2622] outline-none focus:border-[#5A8A82] transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-[#2A2622]/80 block mb-1">
+                      Numéro de téléphone (+216) :
+                    </label>
+                    <input
+                      type="tel"
+                      dir="ltr"
+                      value={participantData.phone}
+                      onChange={(e) => setParticipantData({ ...participantData, phone: e.target.value })}
+                      placeholder="+216 55 000 000"
+                      className="w-full bg-[#F4EFEA] border border-[#E8DFD5] rounded-xl px-4 py-3 text-xs text-[#2A2622] outline-none focus:border-[#5A8A82] transition-colors font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-[#2A2622]/80 block mb-1">
+                      Adresse e-mail institutionnelle :
+                    </label>
+                    <input
+                      type="email"
+                      value={participantData.email}
+                      onChange={(e) => setParticipantData({ ...participantData, email: e.target.value })}
+                      placeholder="cabinet@psychomotricite.tn"
+                      className="w-full bg-[#F4EFEA] border border-[#E8DFD5] rounded-xl px-4 py-3 text-xs text-[#2A2622] outline-none focus:border-[#5A8A82] transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t border-[#E8DFD5]">
+                  <button
+                    type="button"
+                    onClick={() => setBookingStep(1)}
+                    className="min-h-[48px] px-4 rounded-xl text-xs font-semibold text-[#2A2622]/70 hover:bg-[#F4EFEA]"
+                  >
+                    Retour
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!participantData.fullName || !participantData.phone}
+                    onClick={handleNextStep}
+                    className="min-h-[48px] px-6 rounded-xl bg-[#5A8A82] hover:bg-[#4E7770] disabled:opacity-50 text-[#FAF7F2] text-xs font-semibold transition-all shadow-sensory-sm"
+                  >
+                    Émettre l’attestation
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Étape 3 : Confirmation & Billet dématérialisé */}
+            {bookingStep === 3 && generatedRef && (
+              <div className="space-y-6 text-center">
+                <div className="w-14 h-14 rounded-2xl bg-[#7A9B76]/20 text-[#5A8A82] flex items-center justify-center mx-auto border border-[#7A9B76]/30">
+                  <CheckCircle2 className="w-8 h-8 stroke-[2]" />
+                </div>
+
+                <div>
+                  <h3 className="text-2xl font-bold tracking-tight">Inscription Confirmée</h3>
+                  <p className="text-xs text-[#2A2622]/65 mt-1">
+                    Votre place est bloquée auprès du secrétariat permanent de la Chambre.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl bg-[#F4EFEA] border border-[#E8DFD5] p-4 text-xs space-y-2 text-start">
+                  <div className="flex justify-between">
+                    <span className="text-[#2A2622]/60">Référence Billet :</span>
+                    <span className="font-mono font-bold text-[#C67B5C] select-all">{generatedRef}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#2A2622]/60">Titulaire :</span>
+                    <span className="font-semibold">{participantData.fullName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#2A2622]/60">Places réservées :</span>
+                    <span className="font-bold">{ticketCount} place(s)</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 pt-2">
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(
+                      `CSNPT UTICA - Inscription Séminaire confirmée : ${activeBookingModal.title.fr}. Référence : ${generatedRef}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full min-h-[48px] rounded-xl bg-[#5A8A82] hover:bg-[#4E7770] text-[#FAF7F2] text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sensory-sm"
+                  >
+                    <Share2 className="w-4 h-4 stroke-[2]" />
+                    <span>Transmettre par WhatsApp</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={closeBooking}
+                    className="w-full min-h-[44px] rounded-xl text-xs font-semibold text-[#2A2622]/70 hover:bg-[#F4EFEA] transition-colors"
+                  >
+                    Fermer la fenêtre
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      )}
+
+    </section>
+  );
+}

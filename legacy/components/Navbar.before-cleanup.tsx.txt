@@ -1,0 +1,1413 @@
+'use client';
+
+
+
+import React, { useEffect, useState } from 'react';
+
+import Link from 'next/link';
+
+import { usePathname } from 'next/navigation';
+
+import {
+
+  Eye,
+
+  Globe2,
+
+  Menu,
+
+  ShieldCheck,
+
+  Type,
+
+  X,
+
+  Home,
+
+  Search,
+
+  BookOpen,
+
+} from 'lucide-react';
+
+
+
+import { Lang } from '@/lib/types';
+
+
+
+interface NavbarProps {
+
+  currentLang?: Lang;
+
+  onLanguageChange?: (lang: Lang) => void;
+
+
+
+  calmMode?: boolean;
+
+  onToggleCalmMode?: () => void;
+
+
+
+  dyslexicFont?: boolean;
+
+  onToggleDyslexicFont?: () => void;
+
+}
+
+
+
+const STORAGE_KEY = 'csnpt-language';
+
+
+
+const labels = {
+
+  fr: {
+
+    home: 'Accueil',
+
+    observe: 'Observatoire',
+
+    understand: 'Comprendre',
+
+    domains: 'Domaines',
+
+    directory: 'Trouver',
+
+    training: 'Formations',
+
+    news: 'Actualités',
+
+    resources: 'Ressources',
+
+    pro: 'Espace pro',
+
+    calm: 'Apaisé',
+
+    dys: 'Aa',
+
+    menu: 'Menu',
+
+  },
+
+
+
+  ar: {
+
+    home: 'الرئيسية',
+
+    observe: 'المرصد',
+
+    understand: 'فهم الاختصاص',
+
+    domains: 'المجالات',
+
+    directory: 'العثور على أخصائي',
+
+    training: 'التكوينات',
+
+    news: 'الأخبار',
+
+    resources: 'الموارد',
+
+    pro: 'الفضاء المهني',
+
+    calm: 'هادئ',
+
+    dys: 'Aa',
+
+    menu: 'القائمة',
+
+  },
+
+
+
+  en: {
+
+    home: 'Home',
+
+    observe: 'Observatory',
+
+    understand: 'Understand',
+
+    domains: 'Domains',
+
+    directory: 'Find',
+
+    training: 'Training',
+
+    news: 'News',
+
+    resources: 'Resources',
+
+    pro: 'Professional',
+
+    calm: 'Calm',
+
+    dys: 'Aa',
+
+    menu: 'Menu',
+
+  },
+
+};
+
+
+
+function isValidLang(value: string | null): value is Lang {
+
+  return (
+
+    value === 'fr' ||
+
+    value === 'ar' ||
+
+    value === 'en'
+
+  );
+
+}
+
+
+
+export default function Navbar({
+
+  currentLang = 'fr',
+
+  onLanguageChange,
+
+
+
+  calmMode = false,
+
+  onToggleCalmMode,
+
+
+
+  dyslexicFont = false,
+
+  onToggleDyslexicFont,
+
+}: NavbarProps) {
+
+  const pathname = usePathname();
+
+
+
+  const [open, setOpen] = useState(false);
+
+
+
+  /\*
+
+   \* IMPORTANT:
+
+   \*
+
+   \* We intentionally start from currentLang.
+
+   \*
+
+   \* Do NOT read localStorage here.
+
+   \*
+
+   \* This keeps the first Server Render and first Client Render
+
+   \* identical and prevents React hydration errors.
+
+   \*/
+
+  const [effectiveLang, setEffectiveLang] =
+
+    useState\<Lang>(currentLang);
+
+
+
+  /\*
+
+   \* Language initialization is completed after hydration.
+
+   \*/
+
+  const [languageReady, setLanguageReady] =
+
+    useState(false);
+
+
+
+  const t = labels[effectiveLang];
+
+
+
+  /\*
+
+   \* Restore saved language AFTER hydration.
+
+   \*
+
+   \* This is safe because it does not change the initial
+
+   \* server/client render.
+
+   \*/
+
+  useEffect(() => {
+
+    let savedLanguage: Lang = currentLang;
+
+
+
+    try {
+
+      const saved =
+
+        window\.localStorage.getItem(
+
+          STORAGE_KEY
+
+        );
+
+
+
+      if (isValidLang(saved)) {
+
+        savedLanguage = saved;
+
+      }
+
+    } catch {
+
+      savedLanguage = currentLang;
+
+    }
+
+
+
+    setEffectiveLang(savedLanguage);
+
+
+
+    /\*
+
+     \* Synchronize parent page state.
+
+     \*/
+
+    onLanguageChange?.(savedLanguage);
+
+
+
+    /\*
+
+     \* Synchronize document language/direction.
+
+     \*/
+
+    document.documentElement.lang =
+
+      savedLanguage;
+
+
+
+    document.documentElement.dir =
+
+      savedLanguage === 'ar'
+
+        ? 'rtl'
+
+        : 'ltr';
+
+
+
+    document.documentElement.dataset.csnptLanguage =
+
+      savedLanguage;
+
+
+
+    /\*
+
+     \* Tell CSS that the correct language has been loaded.
+
+     \*/
+
+    document.documentElement.dataset.csnptReady =
+
+      'true';
+
+
+
+    setLanguageReady(true);
+
+  }, []);
+
+
+
+  /\*
+
+   \* Keep direction synchronized after language changes.
+
+   \*/
+
+  useEffect(() => {
+
+    document.documentElement.lang =
+
+      effectiveLang;
+
+
+
+    document.documentElement.dir =
+
+      effectiveLang === 'ar'
+
+        ? 'rtl'
+
+        : 'ltr';
+
+
+
+    document.documentElement.dataset.csnptLanguage =
+
+      effectiveLang;
+
+  }, [effectiveLang]);
+
+
+
+  /\*
+
+   \* Close drawer after route changes.
+
+   \*/
+
+  useEffect(() => {
+
+    setOpen(false);
+
+  }, [pathname]);
+
+
+
+  /\*
+
+   \* Change language.
+
+   \*/
+
+  function changeLanguage(lang: Lang) {
+
+    setEffectiveLang(lang);
+
+
+
+    try {
+
+      window\.localStorage.setItem(
+
+        STORAGE_KEY,
+
+        lang
+
+      );
+
+    } catch {
+
+      // Ignore storage errors.
+
+    }
+
+
+
+    document.documentElement.lang = lang;
+
+
+
+    document.documentElement.dir =
+
+      lang === 'ar'
+
+        ? 'rtl'
+
+        : 'ltr';
+
+
+
+    document.documentElement.dataset.csnptLanguage =
+
+      lang;
+
+
+
+    document.documentElement.dataset.csnptReady =
+
+      'true';
+
+
+
+    onLanguageChange?.(lang);
+
+  }
+
+
+
+  function toggleMenu() {
+
+    setOpen(value => !value);
+
+  }
+
+
+
+  function closeMenu() {
+
+    setOpen(false);
+
+  }
+
+
+
+  function isActive(path: string) {
+
+    if (path === '/') {
+
+      return pathname === '/';
+
+    }
+
+
+
+    return pathname.startsWith(path);
+
+  }
+
+
+
+  const desktopLinks = [
+
+    ['#observatory', t.observe],
+
+    ['#understand', t.understand],
+
+    ['#domains', t.domains],
+
+    ['/trouver', t.directory],
+
+    ['/formations', t.training],
+
+    ['/actualites', t.news],
+
+    ['/ressources', t.resources],
+
+  ] as const;
+
+
+
+  return (
+
+    <>
+
+      \<header className="csnpt-nav">
+
+        \<div className="csnpt-shell nav-inner">
+
+
+
+          {/\* BRAND \*/}
+
+          \<Link
+
+            href="/"
+
+            className="brand"
+
+            aria-label="CSNPT"
+
+            onClick={closeMenu}
+
+          >
+
+            \<span
+
+              className="brand-mark"
+
+              aria-hidden="true"
+
+            >
+
+              \<i />
+
+              \<i />
+
+              \<i />
+
+            \</span>
+
+
+
+            \<span className="brand-word">
+
+              \<strong>CSNPT\</strong>
+
+
+
+              \<small>
+
+                Psychomotriciens Tunisiens
+
+              \</small>
+
+            \</span>
+
+          \</Link>
+
+
+
+          {/\* DESKTOP NAV \*/}
+
+          \<nav
+
+            className="desktop-nav"
+
+            aria-label={
+
+              effectiveLang === 'ar'
+
+                ? 'التنقل الرئيسي'
+
+                : effectiveLang === 'en'
+
+                  ? 'Main navigation'
+
+                  : 'Navigation principale'
+
+            }
+
+          >
+
+            {desktopLinks.map(
+
+              ([href, label]) => {
+
+                if (href.startsWith('/')) {
+
+                  return (
+
+                    \<Link
+
+                      key={href}
+
+                      href={href}
+
+                    >
+
+                      {label}
+
+                    \</Link>
+
+                  );
+
+                }
+
+
+
+                return (
+
+                  \<a
+
+                    key={href}
+
+                    href={href}
+
+                  >
+
+                    {label}
+
+                  \</a>
+
+                );
+
+              }
+
+            )}
+
+          \</nav>
+
+
+
+          {/\* DESKTOP TOOLS \*/}
+
+          \<div className="nav-tools">
+
+
+
+            {/\* CALM \*/}
+
+            \<button
+
+              className={\`nav-tool ${
+
+                calmMode ? 'is-on' : ''
+
+              }\`}
+
+              type="button"
+
+              onClick={onToggleCalmMode}
+
+              aria-pressed={calmMode}
+
+              title={t.calm}
+
+            >
+
+              \<Eye size={16} />
+
+              \<span>{t.calm}\</span>
+
+            \</button>
+
+
+
+            {/\* DYSLEXIC \*/}
+
+            \<button
+
+              className={\`nav-tool ${
+
+                dyslexicFont ? 'is-on' : ''
+
+              }\`}
+
+              type="button"
+
+              onClick={
+
+                onToggleDyslexicFont
+
+              }
+
+              aria-pressed={dyslexicFont}
+
+              title="Accessible typography"
+
+            >
+
+              \<Type size={16} />
+
+              \<span>{t.dys}\</span>
+
+            \</button>
+
+
+
+            {/\* LANGUAGE \*/}
+
+            \<div
+
+              className="lang-switch"
+
+              aria-label="Language"
+
+            >
+
+              \<Globe2 size={15} />
+
+
+
+              {(
+
+                ['fr', 'ar', 'en'] as Lang[]
+
+              ).map(lang => (
+
+                \<button
+
+                  key={lang}
+
+                  type="button"
+
+                  className={
+
+                    effectiveLang === lang
+
+                      ? 'active'
+
+                      : ''
+
+                  }
+
+                  onClick={() =>
+
+                    changeLanguage(lang)
+
+                  }
+
+                  aria-pressed={
+
+                    effectiveLang === lang
+
+                  }
+
+                >
+
+                  {lang === 'ar'
+
+                    ? 'ع'
+
+                    : lang.toUpperCase()}
+
+                \</button>
+
+              ))}
+
+            \</div>
+
+
+
+            {/\* PROFESSIONAL \*/}
+
+            \<Link
+
+              className="nav-pro"
+
+              href="/espace-professionnel"
+
+            >
+
+              \<ShieldCheck size={16} />
+
+              \<span>{t.pro}\</span>
+
+            \</Link>
+
+          \</div>
+
+
+
+          {/\* MOBILE MENU BUTTON \*/}
+
+          \<button
+
+            className="mobile-menu-button"
+
+            type="button"
+
+            onClick={toggleMenu}
+
+            aria-expanded={open}
+
+            aria-label={t.menu}
+
+          >
+
+            {open ? (
+
+              \<X size={21} />
+
+            ) : (
+
+              \<Menu size={21} />
+
+            )}
+
+          \</button>
+
+        \</div>
+
+
+
+        {/\* MOBILE DRAWER \*/}
+
+        {open && (
+
+          \<div
+
+            className="mobile-nav"
+
+            role="dialog"
+
+            aria-label={t.menu}
+
+          >
+
+            \<div className="csnpt-shell mobile-nav-inner">
+
+
+
+              \<Link
+
+                href="/"
+
+                onClick={closeMenu}
+
+              >
+
+                {t.home}
+
+              \</Link>
+
+
+
+              \<a
+
+                href="/#observatory"
+
+                onClick={closeMenu}
+
+              >
+
+                {t.observe}
+
+              \</a>
+
+
+
+              \<a
+
+                href="/#understand"
+
+                onClick={closeMenu}
+
+              >
+
+                {t.understand}
+
+              \</a>
+
+
+
+              \<a
+
+                href="/#domains"
+
+                onClick={closeMenu}
+
+              >
+
+                {t.domains}
+
+              \</a>
+
+
+
+              \<Link
+
+                href="/trouver"
+
+                onClick={closeMenu}
+
+              >
+
+                {t.directory}
+
+              \</Link>
+
+
+
+              \<Link
+
+                href="/formations"
+
+                onClick={closeMenu}
+
+              >
+
+                {t.training}
+
+              \</Link>
+
+
+
+              \<Link
+
+                href="/actualites"
+
+                onClick={closeMenu}
+
+              >
+
+                {t.news}
+
+              \</Link>
+
+
+
+              \<Link
+
+                href="/ressources"
+
+                onClick={closeMenu}
+
+              >
+
+                {t.resources}
+
+              \</Link>
+
+
+
+              \<Link
+
+                className="mobile-pro"
+
+                href="/espace-professionnel"
+
+                onClick={closeMenu}
+
+              >
+
+                \<ShieldCheck size={16} />
+
+                {t.pro}
+
+              \</Link>
+
+
+
+              \<div className="mobile-settings">
+
+
+
+                {/\* LANGUAGE \*/}
+
+                \<div className="lang-switch">
+
+                  \<Globe2 size={15} />
+
+
+
+                  {(
+
+                    ['fr', 'ar', 'en'] as Lang[]
+
+                  ).map(lang => (
+
+                    \<button
+
+                      key={lang}
+
+                      type="button"
+
+                      className={
+
+                        effectiveLang === lang
+
+                          ? 'active'
+
+                          : ''
+
+                      }
+
+                      onClick={() =>
+
+                        changeLanguage(lang)
+
+                      }
+
+                      aria-pressed={
+
+                        effectiveLang === lang
+
+                      }
+
+                    >
+
+                      {lang === 'ar'
+
+                        ? 'العربية'
+
+                        : lang.toUpperCase()}
+
+                    \</button>
+
+                  ))}
+
+                \</div>
+
+
+
+                {/\* CALM \*/}
+
+                \<button
+
+                  className={\`nav-tool ${
+
+                    calmMode ? 'is-on' : ''
+
+                  }\`}
+
+                  type="button"
+
+                  onClick={
+
+                    onToggleCalmMode
+
+                  }
+
+                  aria-pressed={calmMode}
+
+                >
+
+                  \<Eye size={16} />
+
+                  {t.calm}
+
+                \</button>
+
+
+
+                {/\* DYSLEXIC \*/}
+
+                \<button
+
+                  className={\`nav-tool ${
+
+                    dyslexicFont ? 'is-on' : ''
+
+                  }\`}
+
+                  type="button"
+
+                  onClick={
+
+                    onToggleDyslexicFont
+
+                  }
+
+                  aria-pressed={
+
+                    dyslexicFont
+
+                  }
+
+                >
+
+                  \<Type size={16} />
+
+                  {t.dys}
+
+                \</button>
+
+
+
+              \</div>
+
+            \</div>
+
+          \</div>
+
+        )}
+
+      \</header>
+
+
+
+      {/\* =====================================================
+
+          GLOBAL MOBILE BOTTOM NAVIGATION
+
+          ===================================================== \*/}
+
+
+
+      \<nav
+
+        className="mobile-bottom-nav"
+
+        aria-label={
+
+          effectiveLang === 'ar'
+
+            ? 'التنقل على الهاتف'
+
+            : effectiveLang === 'en'
+
+              ? 'Mobile navigation'
+
+              : 'Navigation mobile'
+
+        }
+
+      >
+
+
+
+        {/\* ACCUEIL \*/}
+
+        \<Link
+
+          href="/"
+
+          className={\`mobile-bottom-link ${
+
+            isActive('/')
+
+              ? 'active'
+
+              : ''
+
+          }\`}
+
+          aria-current={
+
+            isActive('/')
+
+              ? 'page'
+
+              : undefined
+
+          }
+
+        >
+
+          \<span
+
+            className="mobile-nav-icon"
+
+            aria-hidden="true"
+
+          >
+
+            \<Home size={19} />
+
+          \</span>
+
+
+
+          \<span>{t.home}\</span>
+
+        \</Link>
+
+
+
+        {/\* TROUVER \*/}
+
+        \<Link
+
+          href="/trouver"
+
+          className={\`mobile-bottom-link ${
+
+            isActive('/trouver')
+
+              ? 'active'
+
+              : ''
+
+          }\`}
+
+          aria-current={
+
+            isActive('/trouver')
+
+              ? 'page'
+
+              : undefined
+
+          }
+
+        >
+
+          \<span
+
+            className="mobile-nav-icon"
+
+            aria-hidden="true"
+
+          >
+
+            \<Search size={19} />
+
+          \</span>
+
+
+
+          \<span>{t.directory}\</span>
+
+        \</Link>
+
+
+
+        {/\* COMPRENDRE \*/}
+
+        \<Link
+
+          href="/comprendre"
+
+          className={\`mobile-bottom-link ${
+
+            isActive('/comprendre')
+
+              ? 'active'
+
+              : ''
+
+          }\`}
+
+          aria-current={
+
+            isActive('/comprendre')
+
+              ? 'page'
+
+              : undefined
+
+          }
+
+        >
+
+          \<span
+
+            className="mobile-nav-icon"
+
+            aria-hidden="true"
+
+          >
+
+            \<BookOpen size={19} />
+
+          \</span>
+
+
+
+          \<span>{t.understand}\</span>
+
+        \</Link>
+
+
+
+        {/\* FORMATIONS \*/}
+
+        \<Link
+
+          href="/formations"
+
+          className={\`mobile-bottom-link ${
+
+            isActive('/formations')
+
+              ? 'active'
+
+              : ''
+
+          }\`}
+
+          aria-current={
+
+            isActive('/formations')
+
+              ? 'page'
+
+              : undefined
+
+          }
+
+        >
+
+          \<span
+
+            className="mobile-nav-icon"
+
+            aria-hidden="true"
+
+          >
+
+            \<span className="mobile-nav-text-icon">
+
+              F
+
+            \</span>
+
+          \</span>
+
+
+
+          \<span>{t.training}\</span>
+
+        \</Link>
+
+
+
+        {/\* MENU \*/}
+
+        \<button
+
+          type="button"
+
+          className={\`mobile-bottom-link ${
+
+            open ? 'active' : ''
+
+          }\`}
+
+          aria-label={t.menu}
+
+          aria-expanded={open}
+
+          onClick={toggleMenu}
+
+        >
+
+          \<span
+
+            className="mobile-nav-icon"
+
+            aria-hidden="true"
+
+          >
+
+            {open ? (
+
+              \<X size={19} />
+
+            ) : (
+
+              \<Menu size={19} />
+
+            )}
+
+          \</span>
+
+
+
+          \<span>{t.menu}\</span>
+
+        \</button>
+
+      \</nav>
+
+
+
+      {/\*
+
+       \* Keeps React aware that initialization completed.
+
+       \* Not visually rendered.
+
+       \*/}
+
+      \<span
+
+        aria-hidden="true"
+
+        style={{
+
+          display: 'none',
+
+        }}
+
+      >
+
+        {languageReady ? 'ready' : ''}
+
+      \</span>
+
+    \</>
+
+  );
+
+}

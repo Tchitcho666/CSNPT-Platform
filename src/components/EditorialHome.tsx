@@ -210,7 +210,7 @@ function PillarIllustration({ index }: { index: number }) {
       sizes="(max-width: 700px) 90vw, 30vw"
       alt=""
       loading="lazy"
-      className="pillar-illustration mix-blend-multiply opacity-90 saturate-[0.85] bg-transparent shadow-none border-0"
+    className="pillar-illustration max-md:!mx-auto max-md:!max-w-[280px] mix-blend-multiply opacity-90 saturate-[0.85] bg-transparent shadow-none border-0"
     />
   );
 }
@@ -264,7 +264,7 @@ export default function EditorialHome() {
         onToggleDyslexicFont={handleDyslexicToggle}
       />
       <main id="main-content" className="editorial-home" dir={isRtl ? "rtl" : "ltr"}>
-        <section className="editorial-hero grid grid-cols-12 items-center gap-8 bg-[#F7F3EB] px-8 pt-12 pb-24 lg:pt-16" aria-labelledby="home-title">
+        <section className="editorial-hero max-md:!h-auto max-md:!min-h-0 max-md:!px-4 max-md:!pt-24 max-md:!pb-12 grid grid-cols-12 items-center gap-8 bg-[#F7F3EB] px-8 pt-12 pb-24 lg:pt-16" aria-labelledby="home-title">
           <div className="hero-copy col-span-12 lg:col-span-5">
             <p className="hero-kicker mb-6 text-sm font-bold tracking-[0.2em]">{content.kicker}</p>
             <h1 id="home-title" className="font-serif text-7xl leading-none text-[#14272A]">
@@ -299,7 +299,7 @@ export default function EditorialHome() {
             <h2 id="pillars-title">{content.pillarsTitle}</h2>
             <p>{content.pillarsIntro}</p>
           </div>
-          <div id="domains" className="pillar-list grid grid-cols-1 gap-8 md:col-span-3 md:grid-cols-3 md:gap-0">
+          <div id="domains" className="pillar-list grid grid-cols-1 gap-8 max-md:!grid-cols-1 max-md:!gap-6 md:col-span-3 md:grid-cols-3 md:gap-0">
             {content.pillars.map((pillar, index) => (
               <article className="pillar-item group" key={pillar.title}>
                 <div className="pillar-body flex flex-row items-center gap-6">
@@ -327,7 +327,7 @@ export default function EditorialHome() {
             <p className="section-eyebrow">{content.servicesEyebrow}</p>
             <h2 id="services-title">{content.servicesTitle}</h2>
           </div>
-          <nav aria-label={content.servicesTitle} className="service-list grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+          <nav aria-label={content.servicesTitle} className="service-list grid grid-cols-1 gap-6 max-md:!grid-cols-1 max-md:!gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {content.services.map((service, index) => {
               const Icon = serviceIcons[index];
               return (

@@ -294,47 +294,44 @@ export default function EditorialHome() {
           </div>
         </section>
 
-        <section id="understand" className="home-pillars border-t border-[#D6CFC3]" aria-labelledby="pillars-title">
-          <div className="sr-only">
+        <section id="understand" className="home-pillars-restored" aria-labelledby="pillars-title">
+          <div className="home-restored-heading">
+            <p className="home-restored-eyebrow">{content.pillarsEyebrow}</p>
             <h2 id="pillars-title">{content.pillarsTitle}</h2>
             <p>{content.pillarsIntro}</p>
           </div>
-          <div id="domains" className="pillar-list grid grid-cols-1 gap-8 md:col-span-3 md:grid-cols-3 md:gap-0">
+          <div id="domains" className="pillar-list-restored grid grid-cols-1 md:grid-cols-3">
             {content.pillars.map((pillar, index) => (
-              <article className="pillar-item group" key={pillar.title}>
-                <div className="pillar-body flex flex-row items-center gap-6">
-                  <div className="pillar-image-wrap w-full shrink-0 md:w-[40%]">
+              <article className="pillar-card-restored group" key={pillar.title}>
+                <div className="pillar-image-restored">
                     <PillarIllustration index={index} />
-                  </div>
-                  <div className="pillar-copy flex w-full min-w-0 flex-1 flex-col md:w-[60%]">
-                    <div className="pillar-topline">
-                      <span className="pillar-number">0{index + 1}</span>
-                    </div>
-                    <h3>{pillar.title}</h3>
-                    <p>{pillar.description}</p>
-                    <Link className="pillar-arrow-link inline-flex h-10 w-10 items-center justify-center self-end rounded-full transition hover:bg-[#0E5A5F] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C4623B]" href={pillar.href} aria-label={`${content.discover} : ${pillar.title}`}>
-                      <ArrowRight size={18} aria-hidden="true" className="rtl:rotate-180" />
-                    </Link>
-                  </div>
+                </div>
+                <div className="pillar-copy-restored">
+                  <p className="pillar-index-restored">0{index + 1}</p>
+                  <h3>{pillar.title}</h3>
+                  <p>{pillar.description}</p>
+                  <Link href={pillar.href} aria-label={`${content.discover} : ${pillar.title}`}>
+                    {content.discover}<ArrowRight size={16} aria-hidden="true" className="rtl:rotate-180" />
+                  </Link>
                 </div>
               </article>
             ))}
           </div>
         </section>
 
-        <section id="observatory" className="home-services mt-16" aria-labelledby="services-title">
-          <div className="services-heading">
-            <p className="section-eyebrow">{content.servicesEyebrow}</p>
+        <section id="observatory" className="home-actions-restored" aria-labelledby="services-title">
+          <div className="home-restored-heading home-actions-heading">
+            <p className="home-restored-eyebrow">{content.servicesEyebrow}</p>
             <h2 id="services-title">{content.servicesTitle}</h2>
           </div>
-          <nav aria-label={content.servicesTitle} className="service-list grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+          <nav aria-label={content.servicesTitle} className="service-list-restored grid grid-cols-1 md:grid-cols-4">
             {content.services.map((service, index) => {
               const Icon = serviceIcons[index];
               return (
-                <Link href={service.href} className="service-link group flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0E5A5F]" key={service.title}>
-                  <span className={`service-icon service-icon-${index + 1} flex h-12 w-12 items-center justify-center rounded-full`}><Icon size={26} strokeWidth={1.6} aria-hidden="true" /></span>
-                  <span className="service-copy"><strong>{service.title}</strong><small>{service.description}</small></span>
-                  <ArrowRight className="service-arrow shrink-0 text-[#C4623B] transition-transform group-hover:translate-x-1 rtl:rotate-180" size={18} aria-hidden="true" />
+                <Link href={service.href} className="service-card-restored group" key={service.title}>
+                  <span className={`service-icon-restored service-icon-${index + 1}`}><Icon size={23} strokeWidth={1.6} aria-hidden="true" /></span>
+                  <span className="service-copy-restored"><strong>{service.title}</strong><small>{service.description}</small></span>
+                  <ArrowRight className="service-arrow-restored rtl:rotate-180" size={18} aria-hidden="true" />
                 </Link>
               );
             })}

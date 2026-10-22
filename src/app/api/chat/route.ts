@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(req: Request) {
   try {
@@ -11,17 +11,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ reply: "Message vide." }, { status: 400 });
     }
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      systemInstruction: "Tu es l'assistant officiel de la CSNPT. Réponds de manière professionnelle et chaleureuse en français."
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash', 
+      contents: message,
+      config: {
+        systemInstruction: "Tu es l'assistant officiel de la CSNPT. Réponds de manière professionnelle, chaleureuse et concise en français.",
+      }
     });
 
-    const result = await model.generateContent(message);
-    const response = await result.response;
-
-    return NextResponse.json({ reply: response.text() });
+    return NextResponse.json({ reply: response.text });
   } catch (error: any) {
-    console.error("Chat API Error:", error.message);
-    return NextResponse.json({ reply: "Désolé, le service est temporairement indisponible." }, { status: 500 });
+    console.error("Chat API Error:", error);
+    return NextResponse.json({ 
+      reply: "Désolé, le service est temporairement indisponible." 
+    }, { status: 500 });
   }
 }

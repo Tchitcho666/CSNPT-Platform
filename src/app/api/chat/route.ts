@@ -15,13 +15,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ reply: "Erreur: API Key manquante." }, { status: 500 });
     }
 
-    // 🚀 Fallback Models: إذا الأول مشغول، يجرب الثاني، وإلا الثالث
+    // 🚀 نبعثو الطلب لكل الموديلات في نفس الوقت (Parallel)
     const models = ["gemini-3.8-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
-    let lastError = "";
-
-    for (const model of models) {
-      try {
-        const response = await fetch(
+    
+    try {
+      // Promise.any ياخذ أول موديل يجاوب بنجاح
+      const firstResponse = await Promise.any(models.map(async (model) => {
+        const res = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
           {
             method: 'POST',
@@ -32,28 +32,27 @@ export async function POST(req: Request) {
                 parts: [{ text: "Tu es l'assistant officiel de la CSNPT. Réponds de manière professionnelle et chaleureuse en français." }]
               }
             }),
+            // Timeout 8 ثواني لكل موديل
+            signal: AbortSignal.timeout(8000) 
           }
         );
 
-        const data: any = await response.json();
-
-        // إذا نجح، نرجعو الجواب ديركت
-        if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-          return NextResponse.json({ reply: data.candidates[0].content.parts[0].text });
-        }
-
-        // إذا فشل، نسجلو الـ Error ونجربو الموديل اللي بعدو
-        lastError = data.error?.message || `Le modèle ${model} est indisponible.`;
+        if (!res.ok) throw new Error(`Model ${model} failed`);
         
-      } catch (err: any) {
-        lastError = err.message;
-      }
-    }
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (!text) throw new Error(`No text from ${model}`);
+        return text;
+      }));
 
-    // إذا الكل فشلو، نرجعو الـ Error الأخير
-    return NextResponse.json({ 
-      reply: `🔴 Erreur: ${lastError}` 
-    }, { status: 200 });
+      return NextResponse.json({ reply: firstResponse });
+
+    } catch (err) {
+      return NextResponse.json({ 
+        reply: "🔴 Erreur: Tous les modèles sont indisponibles ou lents. Réessayez plus tard." 
+      }, { status: 200 });
+    }
 
   } catch (error: any) {
     return NextResponse.json({ 

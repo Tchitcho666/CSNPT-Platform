@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+export const dynamic = 'force-dynamic'; // باش Vercel ما يعملش كاش للطلب
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 export async function POST(req: Request) {
   try {
@@ -11,19 +13,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ reply: "Message vide." }, { status: 400 });
     }
 
+    // استخدام الموديل الصحيح للمكتبة الجديدة
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash', 
+      model: 'gemini-1.5-flash', 
       contents: message,
       config: {
         systemInstruction: "Tu es l'assistant officiel de la CSNPT. Réponds de manière professionnelle, chaleureuse et concise en français.",
       }
     });
 
-    return NextResponse.json({ reply: response.text });
+    // في المكتبة الجديدة، النص يرجع في response.text
+    const text = response.text || "Désolé, je n'ai pas de réponse.";
+    
+    return NextResponse.json({ reply: text });
+
   } catch (error: any) {
     console.error("Chat API Error:", error);
     return NextResponse.json({ 
-      reply: "Désolé, le service est temporairement indisponible." 
+      reply: `Erreur: ${error.message || "Problème technique"}` 
     }, { status: 500 });
   }
 }

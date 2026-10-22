@@ -1,30 +1,46 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
 
-export const dynamic = 'force-dynamic'; // باش Vercel ما يعملش كاش للطلب
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
     const { message } = await req.json();
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!message) {
       return NextResponse.json({ reply: "Message vide." }, { status: 400 });
     }
 
-    // استخدام الموديل الصحيح للمكتبة الجديدة
-    const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash', 
-      contents: message,
-      config: {
-        systemInstruction: "Tu es l'assistant officiel de la CSNPT. Réponds de manière professionnelle, chaleureuse et concise en français.",
-      }
-    });
+    if (!apiKey) {
+      return NextResponse.json({ reply: "Erreur: API Key manquante." }, { status: 500 });
+    }
 
-    // في المكتبة الجديدة، النص يرجع في response.text
-    const text = response.text || "Désolé, je n'ai pas de réponse.";
-    
+    // نكلمو Google API ديركت بـ fetch
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: message }] }],
+          systemInstruction: {
+            parts: [{ text: "Tu es l'assistant officiel de la CSNPT. Réponds de manière professionnelle et chaleureuse en français." }]
+          }
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    // إذا فما Error، نرجعوه للمتصفح باش نشوفوه
+    if (!response.ok) {
+      console.error("Google API Error:", data);
+      return NextResponse.json({ 
+        reply: `Erreur Google: ${data.error?.message || 'Inconnue'}` 
+      }, { status: response.status });
+    }
+
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Désolé, je n'ai pas de réponse.";
     return NextResponse.json({ reply: text });
 
   } catch (error: any) {

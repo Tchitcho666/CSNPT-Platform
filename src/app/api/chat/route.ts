@@ -5,11 +5,15 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   try {
     const { message } = await req.json();
-    // 💡 هنا ننقيو الـ Key من أي مسافة ولا سطر جديد
-    const apiKey = process.env.OPENROUTER_API_KEY?.replace(/\s+/g, '');
+    // 💡 حماية قصوى: نمسحو أي مسافة أو سطر جديد أو علامة اقتباس
+    let apiKey = process.env.OPENROUTER_API_KEY || '';
+    apiKey = apiKey.replace(/['"]/g, '').replace(/\s+/g, '').trim();
 
     if (!message) return NextResponse.json({ reply: "Message vide." }, { status: 400 });
     if (!apiKey) return NextResponse.json({ reply: "Erreur: OpenRouter API Key manquante." }, { status: 500 });
+
+    // 🚀 نستعملو موديل Mistral المجاني (مستقر جداً)
+    const modelName = "mistralai/mistral-7b-instruct:free";
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -20,7 +24,7 @@ export async function POST(req: Request) {
         "X-Title": "CSNPT Assistant"
       },
       body: JSON.stringify({
-        model: "google/gemini-2.0-flash-exp:free", 
+        model: modelName, 
         messages: [
           { role: "system", content: "Tu es l'assistant officiel de la CSNPT. Réponds de manière professionnelle, chaleureuse et concise en français." },
           { role: "user", content: message }
@@ -32,7 +36,7 @@ export async function POST(req: Request) {
 
     if (!response.ok) {
       return NextResponse.json({ 
-        reply: `🔴 Erreur: ${data.error?.message || 'Erreur inconnue'}` 
+        reply: `🔴 Erreur OpenRouter (${modelName}): ${data.error?.message || 'Erreur inconnue'}` 
       }, { status: 200 });
     }
 

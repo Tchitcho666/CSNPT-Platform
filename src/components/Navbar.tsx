@@ -99,6 +99,7 @@ export default function Navbar({
 }: NavbarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
   const [language, setLanguage] = useState<Lang>(currentLang);
 
   useEffect(() => {
@@ -166,8 +167,18 @@ export default function Navbar({
             className="csnpt-brand flex shrink-0 items-center gap-3"
             aria-label={`${t.org} — CSNPT`}
           >
-            <Image src="/csnpt-logo-icon.png" alt="" width={40} height={40} className="h-10 w-10 object-contain" />
-            <span className="font-serif text-2xl font-bold text-[#0E5A5F]">CSNPT</span>
+            {logoFailed ? (
+              <span className="font-serif text-2xl font-bold text-[#0E5A5F]">CSNPT</span>
+            ) : (
+              <Image
+                src="/csnpt-logo-icon.png"
+                alt="CSNPT"
+                width={40}
+                height={40}
+                className="h-10 w-10 object-contain"
+                onError={() => setLogoFailed(true)}
+              />
+            )}
           </Link>
 
           <nav className="csnpt-primary-nav hidden items-center gap-8 lg:flex" aria-label="Navigation principale">

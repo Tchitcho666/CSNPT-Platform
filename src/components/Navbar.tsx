@@ -31,7 +31,6 @@ const STORAGE_KEY = "csnpt-language";
 const labels = {
   fr: {
     org: "Chambre Syndicale Nationale des Psychomotriciens Tunisiens",
-    tagline: "Corps · Espace · Mouvement",
     home: "Accueil",
     observe: "Observatoire",
     understand: "Comprendre",
@@ -49,7 +48,6 @@ const labels = {
   },
   ar: {
     org: "الغرفة النقابية الوطنية لأخصائيي النفس الحركي في تونس",
-    tagline: "الجسد · الفضاء · الحركة",
     home: "الرئيسية",
     observe: "المرصد",
     understand: "فهم الاختصاص",
@@ -67,7 +65,6 @@ const labels = {
   },
   en: {
     org: "National Trade Chamber of Tunisian Psychomotor Therapists",
-    tagline: "Body · Space · Movement",
     home: "Home",
     observe: "Observatory",
     understand: "Understand",
@@ -104,14 +101,10 @@ export default function Navbar({
 
   useEffect(() => {
     let saved = currentLang;
-
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
       if (isLang(stored)) saved = stored;
     } catch {}
-
-    // Restore browser-only preference after hydration.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLanguage(saved);
   }, [currentLang]);
 
@@ -124,18 +117,14 @@ export default function Navbar({
   }, [language, onLanguageChange]);
 
   useEffect(() => {
-    // Close the transient menu when navigation changes the route.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpen(false);
   }, [pathname]);
 
   function changeLanguage(lang: Lang) {
     setLanguage(lang);
-
     try {
       window.localStorage.setItem(STORAGE_KEY, lang);
     } catch {}
-
   }
 
   const t = labels[language];
@@ -160,49 +149,52 @@ export default function Navbar({
   return (
     <>
       <header className="csnpt-global-header sticky top-0 z-50 w-full border-b border-[#14272A]/10 bg-[#F7F3EB]/90 backdrop-blur-md transition-all">
-        <div className="csnpt-global-header-inner mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+        <div className="csnpt-global-header-inner mx-auto flex h-24 max-w-[1400px] items-center justify-between px-6">
+          
+          {/* LOGO AREA - MADE BIGGER AND CLEARER */}
           <Link
             href="/"
             onClick={() => setOpen(false)}
             className="csnpt-brand flex shrink-0 items-center gap-3"
             aria-label={`${t.org} — CSNPT`}
           >
-            {logoFailed ? (
-              <span className="font-serif text-2xl font-bold text-[#0E5A5F]">CSNPT</span>
-            ) : (
+            {!logoFailed && (
               <Image
                 src="/csnpt-logo-icon.png"
-                alt="CSNPT"
-                width={40}
-                height={40}
-                className="h-10 w-10 object-contain"
+                alt="CSNPT Logo"
+                width={56}
+                height={56}
+                className="h-14 w-14 object-contain"
                 onError={() => setLogoFailed(true)}
+                priority
               />
             )}
+            <span className="font-serif text-3xl font-bold text-[#0E5A5F] tracking-tight">
+              CSNPT
+            </span>
           </Link>
 
-          <nav className="csnpt-primary-nav hidden items-center gap-8 lg:flex" aria-label="Navigation principale">
+          <nav className="csnpt-primary-nav hidden items-center gap-6 lg:flex" aria-label="Navigation principale">
             {links.map((link) =>
               link.href.startsWith("/#") ? (
                 <a
                   key={link.href}
                   href={link.href}
-                  className="group relative whitespace-nowrap text-sm font-medium text-[#14272A] transition-colors hover:text-[#0E5A5F]"
+                  className="group relative whitespace-nowrap text-[15px] font-medium text-[#14272A] transition-colors hover:text-[#0E5A5F]"
                 >
-                  {link.label}<span aria-hidden="true" className="absolute -bottom-1 left-0 h-0.5 w-0 bg-[#C4623B] transition-all duration-300 group-hover:w-full" />
+                  {link.label}
+                  <span aria-hidden="true" className="absolute -bottom-1 left-0 h-0.5 w-0 bg-[#C4623B] transition-all duration-300 group-hover:w-full" />
                 </a>
               ) : (
                 <Link
                   key={link.href}
                   href={link.href}
-                  aria-current={active(link.href) ? "page" : undefined}
-                  className={`group relative whitespace-nowrap text-sm font-medium transition-colors hover:text-[#0E5A5F] ${
-                    active(link.href)
-                      ? "text-[#0E5A5F]"
-                      : "text-[#14272A]"
+                  className={`group relative whitespace-nowrap text-[15px] font-medium transition-colors hover:text-[#0E5A5F] ${
+                    active(link.href) ? "text-[#0E5A5F]" : "text-[#14272A]"
                   }`}
                 >
-                  {link.label}<span aria-hidden="true" className="absolute -bottom-1 left-0 h-0.5 w-0 bg-[#C4623B] transition-all duration-300 group-hover:w-full" />
+                  {link.label}
+                  <span aria-hidden="true" className="absolute -bottom-1 left-0 h-0.5 w-0 bg-[#C4623B] transition-all duration-300 group-hover:w-full" />
                 </Link>
               )
             )}
@@ -210,20 +202,18 @@ export default function Navbar({
 
           <div className="csnpt-nav-utilities hidden shrink-0 items-center gap-3 xl:flex">
             <Link href="/#observatory" className="nav-search-link rounded-full p-2 transition hover:bg-black/5" aria-label={t.search} title={t.search}>
-              <Search size={17} aria-hidden="true" />
+              <Search size={18} aria-hidden="true" />
             </Link>
             <button
               type="button"
               onClick={onToggleCalmMode}
               aria-pressed={calmMode}
               title={t.calm}
-              className={`flex h-10 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold ${
-                calmMode
-                  ? "border-[var(--teal)] bg-[var(--surface-soft)]"
-                  : "border-[var(--line)] bg-[var(--paper-2)]"
+              className={`flex h-10 items-center gap-1.5 rounded-xl border px-3 text-[12px] font-semibold transition ${
+                calmMode ? "border-[#0E5A5F] bg-[#0E5A5F]/10 text-[#0E5A5F]" : "border-gray-200 bg-white/50 text-gray-700 hover:bg-white"
               }`}
             >
-              <Eye size={15} />
+              <Eye size={16} />
               {t.calm}
             </button>
 
@@ -232,29 +222,24 @@ export default function Navbar({
               onClick={onToggleDyslexicFont}
               aria-pressed={dyslexicFont}
               title="Accessible typography"
-              className={`flex h-10 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold ${
-                dyslexicFont
-                  ? "border-[var(--teal)] bg-[var(--surface-soft)]"
-                  : "border-[var(--line)] bg-[var(--paper-2)]"
+              className={`flex h-10 items-center gap-1.5 rounded-xl border px-3 text-[12px] font-semibold transition ${
+                dyslexicFont ? "border-[#0E5A5F] bg-[#0E5A5F]/10 text-[#0E5A5F]" : "border-gray-200 bg-white/50 text-gray-700 hover:bg-white"
               }`}
             >
-              <Type size={15} />
+              <Type size={16} />
               {t.dys}
             </button>
 
-            <div className="flex h-10 items-center gap-1 rounded-xl border border-[var(--line)] bg-[var(--paper-2)] p-1">
-              <Globe2 size={14} className="mx-1 text-[var(--muted)]" />
+            <div className="flex h-10 items-center gap-1 rounded-xl border border-gray-200 bg-white/50 p-1">
+              <Globe2 size={14} className="mx-1 text-gray-500" />
               {(["fr", "ar", "en"] as Lang[]).map((lang) => (
                 <button
                   key={lang}
                   type="button"
                   onClick={() => changeLanguage(lang)}
                   aria-pressed={language === lang}
-                  aria-label={lang === "ar" ? "العربية" : lang === "fr" ? "Français" : "English"}
-                  className={`h-8 min-w-8 rounded-lg px-2 text-[10px] font-bold ${
-                    language === lang
-                      ? "bg-[var(--surface-soft)] text-[var(--ink)]"
-                      : "text-[var(--muted)]"
+                  className={`h-8 min-w-8 rounded-lg px-2 text-[11px] font-bold transition ${
+                    language === lang ? "bg-[#0E5A5F] text-white shadow-sm" : "text-gray-500 hover:bg-gray-100"
                   }`}
                 >
                   {lang === "ar" ? "ع" : lang.toUpperCase()}
@@ -264,9 +249,9 @@ export default function Navbar({
 
             <Link
               href="/espace-pro/login"
-              className="flex items-center gap-2 rounded-full bg-[#C4623B] px-5 py-2 font-medium text-white transition-colors hover:bg-[#A84D2B]"
+              className="flex items-center gap-2 rounded-full bg-[#C4623B] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#A84D2B] shadow-md hover:shadow-lg"
             >
-              <ShieldCheck size={15} />
+              <ShieldCheck size={16} />
               {t.pro}
             </Link>
           </div>
@@ -279,142 +264,59 @@ export default function Navbar({
             aria-label={t.menu}
             className="ms-auto grid h-11 w-11 place-items-center rounded-full border border-[#14272A]/10 bg-white/60 transition hover:bg-black/5 xl:hidden"
           >
-            {open ? <X size={21} /> : <Menu size={21} />}
+            {open ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
+        {/* MOBILE MENU */}
         {open && (
-          <div id="site-mobile-menu" className="csnpt-mobile-menu border-t border-[var(--line)] bg-[var(--paper)] xl:hidden">
-            <div className="mx-auto grid w-[calc(100%-32px)] max-w-[700px] gap-1 py-3">
-              <Link href="/" onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-bold hover:bg-[var(--surface-soft)]">
-                {t.home}
-              </Link>
-              <Link href="/#observatory" onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-bold hover:bg-[var(--surface-soft)]">
-                {t.observe}
-              </Link>
-              <Link href="/#understand" onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-bold hover:bg-[var(--surface-soft)]">
-                {t.understand}
-              </Link>
-              <Link href="/#domains" onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-bold hover:bg-[var(--surface-soft)]">
-                {t.domains}
-              </Link>
-              <Link href="/trouver" onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-bold hover:bg-[var(--surface-soft)]">
-                {t.directory}
-              </Link>
-              <Link href="/formations" onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-bold hover:bg-[var(--surface-soft)]">
-                {t.training}
-              </Link>
-              <Link href="/actualites" onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-bold hover:bg-[var(--surface-soft)]">
-                {t.news}
-              </Link>
-              <Link href="/ressources" onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-bold hover:bg-[var(--surface-soft)]">
-                {t.resources}
-              </Link>
-
+          <div id="site-mobile-menu" className="csnpt-mobile-menu border-t border-gray-200 bg-[#F7F3EB] xl:hidden">
+            <div className="mx-auto grid w-[calc(100%-32px)] max-w-[700px] gap-1 py-4">
+               {links.map((link) => (
+                  <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 text-lg font-bold text-[#14272A] hover:bg-black/5">
+                    {link.label}
+                  </Link>
+               ))}
               <Link
                 href="/espace-pro/login"
                 onClick={() => setOpen(false)}
-                className="mt-1 flex items-center gap-2 rounded-xl bg-[var(--teal)] px-4 py-3 font-bold text-white"
+                className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#0E5A5F] px-4 py-3 font-bold text-white"
               >
-                <ShieldCheck size={16} />
+                <ShieldCheck size={18} />
                 {t.pro}
               </Link>
-
-              <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-[var(--line)] pt-3">
-                {(["fr", "ar", "en"] as Lang[]).map((lang) => (
-                  <button
-                    key={lang}
-                    type="button"
-                    onClick={() => changeLanguage(lang)}
-                    aria-pressed={language === lang}
-                    className={`rounded-lg border px-3 py-2 text-xs font-bold ${
-                      language === lang
-                        ? "border-[var(--teal)] bg-[var(--teal)] text-white"
-                        : "border-[var(--line)] bg-[var(--paper-2)]"
-                    }`}
-                  >
-                    {lang === "ar" ? "العربية" : lang.toUpperCase()}
-                  </button>
-                ))}
-
-                <button
-                  type="button"
-                  onClick={onToggleCalmMode}
-                  aria-pressed={calmMode}
-                  className="flex items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--paper-2)] px-3 py-2 text-xs font-bold"
-                >
-                  <Eye size={15} />
-                  {t.calm}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={onToggleDyslexicFont}
-                  aria-pressed={dyslexicFont}
-                  className="flex items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--paper-2)] px-3 py-2 text-xs font-bold"
-                >
-                  <Type size={15} />
-                  {t.dys}
-                </button>
-              </div>
             </div>
           </div>
         )}
       </header>
 
+      {/* MOBILE BOTTOM NAV */}
       <nav
         aria-label={language === "ar" ? "التنقل على الهاتف" : "Navigation mobile"}
-        className="csnpt-mobile-nav fixed inset-x-0 bottom-0 z-[9999] grid min-h-[68px] grid-cols-5 border-t border-[var(--line)] bg-[var(--paper)]/95 px-1 pb-[max(5px,env(safe-area-inset-bottom))] pt-1 backdrop-blur-md xl:hidden"
+        className="csnpt-mobile-nav fixed inset-x-0 bottom-0 z-[9999] grid min-h-[68px] grid-cols-5 border-t border-gray-200 bg-[#F7F3EB]/95 px-1 pb-[max(5px,env(safe-area-inset-bottom))] pt-1 backdrop-blur-md xl:hidden"
       >
-        <Link
-          href="/"
-          className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold ${
-            active("/") ? "bg-[var(--surface-soft)] text-[var(--teal)]" : "text-[var(--muted)]"
-          }`}
-        >
-          <Home size={19} />
+        <Link href="/" className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold ${active("/") ? "text-[#0E5A5F]" : "text-gray-500"}`}>
+          <Home size={20} />
           {t.home}
         </Link>
-
-        <Link
-          href="/trouver"
-          className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold ${
-            active("/trouver") ? "bg-[var(--surface-soft)] text-[var(--teal)]" : "text-[var(--muted)]"
-          }`}
-        >
-          <Search size={19} />
+        <Link href="/trouver" className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold ${active("/trouver") ? "text-[#0E5A5F]" : "text-gray-500"}`}>
+          <Search size={20} />
           {t.directory}
         </Link>
-
-        <Link
-          href="/comprendre"
-          className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold ${
-            active("/comprendre") ? "bg-[var(--surface-soft)] text-[var(--teal)]" : "text-[var(--muted)]"
-          }`}
-        >
-          <BookOpen size={19} />
+        <Link href="/comprendre" className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold ${active("/comprendre") ? "text-[#0E5A5F]" : "text-gray-500"}`}>
+          <BookOpen size={20} />
           {t.understand}
         </Link>
-
-        <Link
-          href="/formations"
-          className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold ${
-            active("/formations") ? "bg-[var(--surface-soft)] text-[var(--teal)]" : "text-[var(--muted)]"
-          }`}
-        >
-          <span className="grid h-[19px] w-[19px] place-items-center text-[11px] font-black">F</span>
+        <Link href="/formations" className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold ${active("/formations") ? "text-[#0E5A5F]" : "text-gray-500"}`}>
+          <span className="grid h-[20px] w-[20px] place-items-center text-[12px] font-black">F</span>
           {t.training}
         </Link>
-
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
-          aria-expanded={open}
-          className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold ${
-            open ? "bg-[var(--surface-soft)] text-[var(--teal)]" : "text-[var(--muted)]"
-          }`}
+          className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-bold ${open ? "text-[#0E5A5F]" : "text-gray-500"}`}
         >
-          {open ? <X size={19} /> : <Menu size={19} />}
+          {open ? <X size={20} /> : <Menu size={20} />}
           {t.menu}
         </button>
       </nav>

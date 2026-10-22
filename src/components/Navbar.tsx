@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   BookOpen,
@@ -157,54 +158,47 @@ export default function Navbar({
 
   return (
     <>
-      <header className="csnpt-global-header sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--paper)]/95 backdrop-blur-md">
-        <div className="csnpt-global-header-inner mx-auto flex h-[76px] w-[calc(100%-32px)] max-w-[1420px] items-center gap-5 lg:w-[calc(100%-56px)]">
+      <header className="csnpt-global-header sticky top-0 z-50 w-full border-b border-[#14272A]/10 bg-[#F7F3EB]/90 backdrop-blur-md transition-all">
+        <div className="csnpt-global-header-inner mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
           <Link
             href="/"
             onClick={() => setOpen(false)}
             className="csnpt-brand flex shrink-0 items-center gap-3"
             aria-label={`${t.org} — CSNPT`}
           >
-            <svg className="csnpt-brand-mark" viewBox="0 0 58 42" fill="none" aria-hidden="true">
-              <path d="M3 14C14 4 27 9 34 16s14 11 21 2M5 34c8-8 10-19 18-21s17 10 25 7" stroke="#0E5A5F" strokeWidth="2.5" strokeLinecap="round" />
-              <path d="M23 29c5-4 7-10 8-16" stroke="#C4623B" strokeWidth="2" strokeLinecap="round" />
-              <circle cx="33" cy="7" r="4.2" fill="#C4623B" />
-            </svg>
-            <span className="brand-word flex flex-col leading-none">
-              <strong><bdi>CSNPT</bdi></strong>
-              <small>{t.org}</small>
-            </span>
+            <Image src="/csnpt-logo-icon.png" alt="" width={40} height={40} className="h-10 w-10 object-contain" />
+            <span className="font-serif text-2xl font-bold text-[#0E5A5F]">CSNPT</span>
           </Link>
 
-          <nav className="csnpt-primary-nav hidden min-w-0 flex-1 items-center justify-center gap-0.5 xl:flex" aria-label="Navigation principale">
+          <nav className="csnpt-primary-nav hidden items-center gap-8 lg:flex" aria-label="Navigation principale">
             {links.map((link) =>
               link.href.startsWith("/#") ? (
                 <a
                   key={link.href}
                   href={link.href}
-                  className="whitespace-nowrap rounded-full px-2.5 py-2 text-[11px] font-bold text-[var(--muted)] transition hover:bg-[var(--surface-soft)] hover:text-[var(--ink)]"
+                  className="group relative whitespace-nowrap text-sm font-medium text-[#14272A] transition-colors hover:text-[#0E5A5F]"
                 >
-                  {link.label}
+                  {link.label}<span aria-hidden="true" className="absolute -bottom-1 left-0 h-0.5 w-0 bg-[#C4623B] transition-all duration-300 group-hover:w-full" />
                 </a>
               ) : (
                 <Link
                   key={link.href}
                   href={link.href}
                   aria-current={active(link.href) ? "page" : undefined}
-                  className={`whitespace-nowrap rounded-full px-2.5 py-2 text-[11px] font-bold transition ${
+                  className={`group relative whitespace-nowrap text-sm font-medium transition-colors hover:text-[#0E5A5F] ${
                     active(link.href)
-                      ? "bg-[var(--surface-soft)] text-[var(--ink)]"
-                      : "text-[var(--muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--ink)]"
+                      ? "text-[#0E5A5F]"
+                      : "text-[#14272A]"
                   }`}
                 >
-                  {link.label}
+                  {link.label}<span aria-hidden="true" className="absolute -bottom-1 left-0 h-0.5 w-0 bg-[#C4623B] transition-all duration-300 group-hover:w-full" />
                 </Link>
               )
             )}
           </nav>
 
-          <div className="csnpt-nav-utilities hidden shrink-0 items-center gap-2 xl:flex">
-            <Link href="/#observatory" className="nav-search-link" aria-label={t.search} title={t.search}>
+          <div className="csnpt-nav-utilities hidden shrink-0 items-center gap-3 xl:flex">
+            <Link href="/#observatory" className="nav-search-link rounded-full p-2 transition hover:bg-black/5" aria-label={t.search} title={t.search}>
               <Search size={17} aria-hidden="true" />
             </Link>
             <button
@@ -259,7 +253,7 @@ export default function Navbar({
 
             <Link
               href="/espace-pro/login"
-              className="flex h-10 items-center gap-2 rounded-xl bg-[var(--teal)] px-4 text-[11px] font-bold text-white transition hover:bg-[var(--teal-dark)]"
+              className="flex items-center gap-2 rounded-full bg-[#C4623B] px-5 py-2 font-medium text-white transition-colors hover:bg-[#A84D2B]"
             >
               <ShieldCheck size={15} />
               {t.pro}
@@ -272,7 +266,7 @@ export default function Navbar({
             aria-expanded={open}
             aria-controls="site-mobile-menu"
             aria-label={t.menu}
-            className="ms-auto grid h-11 w-11 place-items-center rounded-xl border border-[var(--line)] bg-[var(--paper-2)] xl:hidden"
+            className="ms-auto grid h-11 w-11 place-items-center rounded-full border border-[#14272A]/10 bg-white/60 transition hover:bg-black/5 xl:hidden"
           >
             {open ? <X size={21} /> : <Menu size={21} />}
           </button>

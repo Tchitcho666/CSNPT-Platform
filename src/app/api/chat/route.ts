@@ -15,9 +15,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ reply: "Erreur: API Key manquante." }, { status: 500 });
     }
 
-    // 💡 هنا استعملنا v1 بدل v1beta، واستعملنا gemini-1.5-flash
+    // 💡 هنا استعملنا v1beta و gemini-2.0-flash
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -33,7 +33,6 @@ export async function POST(req: Request) {
     const data: any = await response.json();
 
     if (!response.ok) {
-      // نطبعو الخطأ بطريقة نظيفة بلا JSON معقد
       const errMsg = data.error?.message || 'Erreur inconnue';
       return NextResponse.json({ 
         reply: `🔴 Erreur Google: ${errMsg}` 

@@ -5,12 +5,12 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   try {
     const { message } = await req.json();
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    // 💡 هنا ننقيو الـ Key من أي مسافة ولا سطر جديد
+    const apiKey = process.env.OPENROUTER_API_KEY?.replace(/\s+/g, '');
 
     if (!message) return NextResponse.json({ reply: "Message vide." }, { status: 400 });
     if (!apiKey) return NextResponse.json({ reply: "Erreur: OpenRouter API Key manquante." }, { status: 500 });
 
-    // 🚀 OpenRouter: نستعملو موديل Gemini المجاني (بلا High Demand)
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {

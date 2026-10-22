@@ -12,12 +12,12 @@ export async function POST(req: Request) {
     }
 
     if (!apiKey) {
-      return NextResponse.json({ reply: "Erreur: Clé API introuvable." }, { status: 500 });
+      return NextResponse.json({ reply: "Erreur: API Key manquante." }, { status: 500 });
     }
 
-    // نكلمو Google API ديركت
+    // الرجوع للـ Endpoint الرسمي v1beta مع الموديل الصحيح
     const response = await fetch(
-`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -27,13 +27,12 @@ export async function POST(req: Request) {
       }
     );
 
-    const data = await response.json();
+    const data: any = await response.json();
 
-    // إذا فما Error من Google، نرجعوه للمتصفح
     if (!response.ok) {
       return NextResponse.json({ 
         reply: `🔴 Erreur Google: ${data.error?.message || 'Clé invalide'}` 
-      }, { status: 200 }); // نرجعو 200 باش الواجهة توري الرسالة
+      }, { status: 200 });
     }
 
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Désolé, je n'ai pas de réponse.";
@@ -41,7 +40,7 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     return NextResponse.json({ 
-      reply: `🔴 Erreur: ${error.message || "Problème technique"}` 
+      reply: `🔴 Erreur technique: ${error.message || "Problème inconnu"}` 
     }, { status: 200 });
   }
 }

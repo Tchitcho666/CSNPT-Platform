@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   try {
     const { message } = await req.json();
     
-    // 💡 ننقيو الـ Key من أي مسافات ولا علامات
+    // 💡 ننقيو الـ Key من أي مسافة أو علامات
     let apiKey = process.env.OPENROUTER_API_KEY || '';
     apiKey = apiKey.replace(/['"]/g, '').replace(/\s+/g, '').trim();
 
@@ -22,8 +22,8 @@ export async function POST(req: Request) {
         "X-Title": "CSNPT Assistant"
       },
       body: JSON.stringify({
-        // 🚀 الموديل الجديد المجاني المتوفر حالياً على OpenRouter
-        model: "google/gemini-2.5-flash-preview:free", 
+        // 🚀 نستعملو Llama 3.1 (الموديل المجاني الأكثر استقراراً)
+        model: "meta-llama/llama-3.1-70b-instruct:free", 
         messages: [
           { role: "system", content: "Tu es l'assistant officiel de la CSNPT. Réponds de manière professionnelle, chaleureuse et concise en français." },
           { role: "user", content: message }

@@ -1,46 +1,34 @@
 import { NextResponse } from 'next/server';
+import { GoogleGenAI } from '@google/genai';
 
 export const dynamic = 'force-dynamic';
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 export async function POST(req: Request) {
   try {
     const { message } = await req.json();
-    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!message) {
       return NextResponse.json({ reply: "Message vide." }, { status: 400 });
     }
 
-    if (!apiKey) {
-      return NextResponse.json({ reply: "Erreur: API Key manquante." }, { status: 500 });
-    }
-
-    // استخدمنا gemini-pro بدل gemini-1.5-flash
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: message }] }]
-        }),
+    // الموديل الصحيح للمكتبة الجديدة
+    const response = await ai.models.generateContent({
+      model: 'gemini-1.5-flash',
+      contents: message,
+      config: {
+        systemInstruction: "Tu es l'assistant officiel de la CSNPT. Réponds de manière professionnelle et chaleureuse en français.",
       }
-    );
+    });
 
-    const data: any = await response.json();
-
-    if (!response.ok) {
-      return NextResponse.json({ 
-        reply: `🔴 Erreur Google: ${data.error?.message || 'Clé invalide'}` 
-      }, { status: 200 });
-    }
-
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Désolé, je n'ai pas de réponse.";
+    const text = response.text || "Désolé, je n'ai pas de réponse.";
     return NextResponse.json({ reply: text });
 
   } catch (error: any) {
+    console.error("Chat API Error:", error);
     return NextResponse.json({ 
-      reply: `🔴 Erreur technique: ${error.message || "Problème inconnu"}` 
+      reply: `🔴 Erreur: ${error.message || "Problème technique"}` 
     }, { status: 200 });
   }
 }
